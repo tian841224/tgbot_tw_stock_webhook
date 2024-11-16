@@ -46,16 +46,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
                     
                     _logger.LogInformation("擷取網站中...");
 
-                    // 截取特定元素的螢幕截圖並保存
-                    Stream stream = await element.ScreenshotStreamAsync(new ElementScreenshotOptions
-                    {
-                        ScrollIntoView = true,    // 自動滾動到元素位置
-                        OmitBackground = true,    // 可選：移除背景
-                        // Type = ScreenshotType.Png // 可選：指定圖片格式
-                    });
-
-                    _logger.LogInformation("特定元素的螢幕截圖已保存");
-
+                    using Stream stream = await element.ScreenshotStreamAsync();
                     await _botClient.SendPhoto(
                         chatId: message.Chat.Id,
                         photo: InputFile.FromStream(stream),
@@ -124,7 +115,6 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
                             range = "YTD";
                             break;
                     }
-                    // await page.ClickAsync($"//button[value='{range}']");
 
                     // 等待按鈕出現
                     await page.WaitForSelectorAsync($"button[value='{range}']");
@@ -148,16 +138,9 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
 
                     _logger.LogInformation("擷取網站中...");
 
-                    // 截取特定元素的螢幕截圖並保存
-                    Stream stream = await element.ScreenshotStreamAsync(new ElementScreenshotOptions
-                    {
-                        ScrollIntoView = true,    // 自動滾動到元素位置
-                        OmitBackground = true,    // 可選：移除背景
-                                                  // Type = ScreenshotType.Png // 可選：指定圖片格式
-                    });
-
                     _logger.LogInformation("特定元素的螢幕截圖已保存");
-
+                    // 截取特定元素的螢幕截圖並保存
+                    using Stream stream = await element.ScreenshotStreamAsync();
                     await _botClient.SendPhoto(
                       chatId: message.Chat.Id,
                       photo: InputFile.FromStream(stream),
