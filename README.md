@@ -1,140 +1,115 @@
-# TG 台股查詢機器人
+# TG 台股查詢機器人 🤖
 
-<div style="text-align: center;">
-    
-</div>
+一個基於 Telegram 的台股資訊查詢機器人，提供即時股價、K線圖表、新聞等多項功能。
 
-## 使用教學  :memo:
-
-示範機器人(若不想自己部屬也可以直接使用)
+## Demo (架設於免費平台，功能可能不完整)
 
 ```cmd
 https://t.me/Tian_Stock_bot
 ```
 
-&nbsp;
 
-使用方法：
+## 🚀 快速開始
 
-👉 直接執行
+### 安裝步驟
+1. Clone 專案
+2. 在 `appsettings.json` 中設定您的 Telegram Bot API Key
+3. 執行專案
 
-下載後將appsettings.json裡的BotToken換成自己的API Key後執行檔案即可使用
-
-
-👉 使用Docker執行
-
-將程式pull下來後打包成Docker使用
-```cmd
-docker build -t 名稱 . --no-cache
+### Docker 部署
+```bash
+docker build -t [your-image-name] . --no-cache
 ```
 
-&nbsp;
+## 💡 功能特色
 
-## 機器人指令 🗒
+### 核心功能
+- 即時股價查詢
+- 技術分析圖表
+- 個股新聞追蹤
+- 績效資訊查看
+- 多時間週期K線圖
 
-⭐️K線走勢圖
-```cmd
-/k 2330 d
+### 採用技術
+- 🤖 Telegram Bot API 整合
+- 🕷️ Playwright 爬蟲技術
+- ⚡ .NET 6 開發框架
+- 🐳 Docker 容器化部署
+- 🔄 GitHub Actions CI/CD
 
---K線代碼--
-h - 查詢時K線
-d - 查詢日K線
-w - 查詢週K線
-m - 查詢月K線
-5m - 查詢5分K線
-10m - 查詢10分K線
-15m - 查詢15分K線
-30m - 查詢30分K線
-60m - 查詢60分K線
+### 自動化部署流程
+本專案採用 Git 搭配 GitHub Actions 達成自動化部署：
+
+1. **觸發機制**
+   - 為需部署的 commit 加上 tag
+   - Push 至 GitHub 自動觸發部署流程
+
+2. **CI/CD 流程**
+   - **Build 階段**
+     - 執行程式測試
+     - 驗證功能完整性
+     - 測試通過後觸發部署
+   
+   - **Deploy 階段**
+     - 注入 Telegram Bot API Key
+     - 建立並發布 Docker Image
+     - 自動部署至 EC2 執行環境
+
+## 🔧 系統架構
+
+<img src="readme/images/flowchart.png" alt="系統架構圖" height="400" width="600">
+
+## 📖 使用指南
+
+### K線圖表查詢
 ```
-<img src="readme/images/kline.jpg" alt="kline" height="300" width="450">
-&nbsp;
+/k [股票代碼] [週期]
 
-⭐️股價資訊
-```cmd
-/v 2330 
+週期選項：
+h   - 時K線
+d   - 日K線
+w   - 週K線
+m   - 月K線
+5m  - 5分K線
+15m - 15分K線
+30m - 30分K線
+60m - 60分K線
 ```
-<img src="readme/images/detail.jpg" alt="detail" height="300" width="450">
-&nbsp;
+<img src="readme/images/kline.jpg" alt="K線示例" height="300" width="450">
 
-⭐️績效資訊
-```cmd
-/p 2330 
+### 基本資訊查詢
+- 股價資訊：`/v [股票代碼]`
+  
+  <img src="readme/images/detail.jpg" alt="detail" height="300" width="450">
+- 績效資訊：`/p [股票代碼]`
+  
+ <img src="readme/images/proformance.jpg" alt="proformance" height="300" width="450">
+ 
+- 個股新聞：`/n [股票代碼]`
+  
+ <img src="readme/images/news.jpg" alt="news" height="300" width="450">
+
+
+### TradingView 圖表
 ```
-<img src="readme/images/proformance.jpg" alt="proformance" height="300" width="450">
-&nbsp;
+/chart [股票代碼]
+/range [股票代碼] [時間範圍]
 
-⭐️個股新聞
-```cmd
-/n 2330
-```
-<img src="readme/images/news.jpg" alt="news" height="300" width="450">
-&nbsp;
-
-### 使用TradingView查詢
-
-⭐️查看圖表
-```cmd
-/chart 2330
+時間範圍選項：
+1d  - 一日    5d  - 五日
+1m  - 一個月  3m  - 三個月
+6m  - 六個月  ytd - 今年度
+1y  - 一年    5y  - 五年
+all - 全部時間
 ```
 <img src="readme/images/chart.jpg" alt="chart" height="300" width="450">
 
-⭐️指定圖表顯示時間範圍
-```cmd
-/range 2330 1d
+## 🔍 已知問題
+- TradingView 在高頻訪問時可能會要求登入
 
---時間範圍代碼--
-1d   - 一日
-5d   - 五日
-1m   - 一個月
-3m   - 三個月
-6m   - 六個月
-ytd  - 今年度
-1y   - 一年
-5y   - 五年
-all  - 全部
-```
+## 📝 開發計劃
+- [ ] 新增美股市場支援
+- [ ] 觀察名單功能
 
-&nbsp;
-
-## 未來預計更新內容 📝
-
-⭐️已知BUG
-```cmd
-1.TradingView讀取太多次會跳出登入介面
-```
-⭐️預計更新
-```cmd
-1.加入美股
-```
-&nbsp;
-
-## 📄  專案介紹
-
-### ✏️ 程式流程說明
-```cmd
-專案使用Git搭配GitHub Action，執行CICD自動部屬流程
-將需要部屬的commit打上tag，push至GitHub觸發 GitHub Action
-
-GitHub Action流程-
-分為Build及Deploy
-1. Build-測試程式是否能正常執行,成功執行完畢觸發Deploy流程
-2. Deploy-執行前將TG BOT KEY加入至appsetting中
-並將程式打包成Docker Images並上傳至Docker Hub
-3. 登入EC2，將剛上傳的Docker Images Pull下來並執行
-
-使用 C#.NET6 搭配 Telegram Bot套件製作
-使用者傳送指令命令時觸發程式
-利用 Playwright 爬蟲套件，依據使用者指令抓取指定內容並回傳資訊
-```
-
-&nbsp;
-
-### 🖥 系統架構
-&nbsp;
-<img src="readme/images/flowchart.png" alt="flowchart" height="400" width="600">
-
-&nbsp;
-
-
-
+## 🤝 貢獻指南
+歡迎提交 Issue 和 Pull Request 來協助改善專案！
