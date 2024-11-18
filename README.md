@@ -57,7 +57,7 @@ docker build -t [your-image-name] . --no-cache
 
 ## 🔧 系統架構
 
-<img src="readme/images/flowchart-fix.png" alt="系統架構圖" height="400" width="600">
+<img src="readme/images/flowchart-fix.png" alt="系統架構圖" height="400" width="930">
 
 ## 📖 使用指南
 
