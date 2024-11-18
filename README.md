@@ -8,15 +8,16 @@
 https://t.me/Tian_Stock_bot
 ```
 
-
 ## 🚀 快速開始
 
 ### 安裝步驟
 1. Clone 專案
 2. 在 `appsettings.json` 中設定您的 Telegram Bot API Key
-3. 執行專案
+3. 啟動專案
+4. 呼叫SetWebHook API 傳入{BotWebhookUrl}/bot/ 例如: https://{yourdomain}/bot
+5. 開始使用 !
 
-### Docker 部署
+### 🐳 Docker 部署
 ```bash
 docker build -t [your-image-name] . --no-cache
 ```
@@ -32,8 +33,8 @@ docker build -t [your-image-name] . --no-cache
 
 ### 採用技術
 - 🤖 Telegram Bot API 整合
-- 🕷️ Playwright 爬蟲技術
-- ⚡ .NET 6 開發框架
+- 🕷️ PuppeteerSharp 爬蟲技術
+- ⚡  .NET 8 開發框架
 - 🐳 Docker 容器化部署
 - 🔄 GitHub Actions CI/CD
 
