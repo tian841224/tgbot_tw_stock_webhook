@@ -34,6 +34,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
         /// <returns></returns>
         public async Task GetKlineAsync(string stockNumber, Message message, CancellationToken cancellationToken, string? input = "日K")
         {
+            cancellationToken.ThrowIfCancellationRequested();
             await _commonService.RetryAsync(async () =>
             {
                 try
@@ -98,6 +99,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
         /// <returns></returns>
         public async Task GetDetialPriceAsync(string stockNumber, Message message, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             await _commonService.RetryAsync(async () =>
             {
                 try
@@ -198,6 +200,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
         /// <returns></returns>
         public async Task GetPerformanceAsync(string stockNumber, Message message, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             await _commonService.RetryAsync(async () =>
             {
                 try
@@ -263,6 +266,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
         /// <returns></returns>
         public async Task GetNewsAsync(string stockNumber, Message message, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             await _commonService.RetryAsync(async () =>
             {
                 try

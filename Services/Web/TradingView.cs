@@ -31,6 +31,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
         /// <returns></returns>
         public async Task GetChartAsync(string stockNumber, Message message, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             await _commonService.RetryAsync(async () =>
             {
                 try
@@ -43,7 +44,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
                     var element = await page.WaitForSelectorAsync("div.chart-markup-table", new WaitForSelectorOptions { Visible = true })
                                     ?? throw new Exception("未找到指定元素:div.chart-markup-table");
 
-                    
+
                     _logger.LogInformation("擷取網站中...");
 
                     using Stream stream = await element.ScreenshotStreamAsync();
@@ -72,6 +73,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
         /// <returns></returns>
         public async Task GetRangeAsync(string stockNumber, Message message, string? input, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             await _commonService.RetryAsync(async () =>
             {
                 try
