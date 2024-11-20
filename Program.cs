@@ -30,7 +30,7 @@ builder.Services.AddSingleton(dbConfig);
 builder.Services.AddSingleton<IBotService, BotService>();
 
 // 業務邏輯服務使用 Scoped
-builder.Services.AddScoped<UpdateHandler>();
+ builder.Services.AddScoped<UpdateHandler>();
 
 // Lazy延遲載入
 builder.Services.AddLazyScoped<IBrowserHandlers, BrowserHandlers>();
@@ -38,7 +38,6 @@ builder.Services.AddLazyScoped<ICommonService, CommonService>();
 builder.Services.AddLazyScoped<Cnyes>();
 builder.Services.AddLazyScoped<TradingView>();
 builder.Services.AddLazyScoped<ISubscriptionService, SubscriptionService>();
-
 // DB
 builder.Services.AddDbContext<AppDbContext>();
 

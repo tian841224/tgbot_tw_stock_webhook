@@ -11,19 +11,21 @@ using TGBot_TW_Stock_Webhook.Services.Web;
 
 namespace TGBot_TW_Stock_Webhook.Services;
 
-public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logger, IBotService botService, Lazy<TradingView> tradingView, Lazy<Cnyes> cnyes)
+public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logger, IBotService botService, Lazy<TradingView> tradingView, Lazy<Cnyes> cnyes,
+    Lazy<ISubscriptionService> subscriptionService)
 {
     private static readonly InputPollOption[] PollOptions = ["Hello", "World!"];
     private readonly IBotService _botService = botService;
     private readonly Lazy<TradingView> _tradingView = tradingView;
     private readonly Lazy<Cnyes> _cnyes = cnyes;
+    private readonly Lazy<ISubscriptionService> _subscriptionService = subscriptionService;
 
     public async Task HandleErrorAsync(Exception exception, HandleErrorSource source, CancellationToken cancellationToken)
     {
         _logger.LogInformation("HandleError: {Exception}", exception);
         // Cooldown in case of network connection error
         if (exception is RequestException)
-            await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+            await Task.Delay(TimeSpan.FromSeconds(3), cancellationToken);
     }
 
     public async Task HandleUpdateAsync(Update update, CancellationToken cancellationToken)
@@ -48,6 +50,7 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
 
     private async Task OnMessage(Message msg, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         _logger.LogInformation("收到消息類型: {MessageType}", msg.Type);
         try
         {
@@ -68,7 +71,6 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
                 case "hello":
                     await _botService.SendHelloMessageAsync(msg, cancellationToken);
                     break;
-
                 case "/chart":
                 case "/range":
                 case "/k":
@@ -80,10 +82,27 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
                         await _botService.SendErrorMessageAsync(msg, cancellationToken);
                         return;
                     }
-
                     await ProcessStockCommand(command, parts, msg, cancellationToken);
                     break;
-
+                case "/sub":
+                    if (parts.Length < 2 || !int.TryParse(parts[1], out _))
+                    {
+                        await _botService.SendErrorMessageAsync(msg, cancellationToken);
+                        return;
+                    }
+                    await _subscriptionService.Value.Subscription(msg, parts[1], cancellationToken);
+                    break;
+                case "/unsub":
+                    if (parts.Length < 2 || !int.TryParse(parts[1], out _))
+                    {
+                        await _botService.SendErrorMessageAsync(msg, cancellationToken);
+                        return;
+                    }
+                    await _subscriptionService.Value.UnSubscription(msg, parts[1], cancellationToken);
+                    break;
+                case "/list":
+                    await _subscriptionService.Value.GetSubscriptionList(msg, cancellationToken);
+                    break;
                 default:
                     await _botService.SendErrorMessageAsync(msg, cancellationToken);
                     break;
@@ -246,7 +265,7 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
                     break;
                 case "/k":
                     var kRange = parts.Length > 2 ? GetKRange(parts[2]) : "日K";
-                    await _cnyes.Value.GetKlineAsync(stockNumber, message,cancellationToken, kRange);
+                    await _cnyes.Value.GetKlineAsync(stockNumber, message, cancellationToken, kRange);
                     break;
                 case "/v":
                     await _cnyes.Value.GetDetialPriceAsync(stockNumber, message, cancellationToken);
