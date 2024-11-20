@@ -28,16 +28,16 @@ if (dbConfig == null)
 // 長時間執行的服務使用 Singleton
 builder.Services.AddSingleton(dbConfig);
 builder.Services.AddSingleton<IBotService, BotService>();
-builder.Services.AddSingleton<UpdateHandler>();
 
 // 業務邏輯服務使用 Scoped
-// builder.Services.AddScoped<IBotConfigurationService, BotConfigurationService>();
+builder.Services.AddScoped<UpdateHandler>();
 
 // Lazy延遲載入
 builder.Services.AddLazyScoped<IBrowserHandlers, BrowserHandlers>();
 builder.Services.AddLazyScoped<ICommonService, CommonService>();
 builder.Services.AddLazyScoped<Cnyes>();
 builder.Services.AddLazyScoped<TradingView>();
+builder.Services.AddLazyScoped<ISubscriptionService, SubscriptionService>();
 
 // DB
 builder.Services.AddDbContext<AppDbContext>();
