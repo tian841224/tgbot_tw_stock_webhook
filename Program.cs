@@ -1,12 +1,13 @@
 using Telegram.Bot;
-using TGBot_TW_Stock_Webhook.Dto;
+using TGBot_TW_Stock_Webhook.Data;
 using TGBot_TW_Stock_Webhook.Interface;
+using TGBot_TW_Stock_Webhook.Model;
+using TGBot_TW_Stock_Webhook.Model.DTOs;
 using TGBot_TW_Stock_Webhook.Services;
 using TGBot_TW_Stock_Webhook.Services.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 
 // Setup bot configuration
@@ -14,18 +15,25 @@ var botConfigSection = builder.Configuration.GetSection("BotConfiguration");
 builder.Services.Configure<BotConfiguration>(botConfigSection);
 builder.Services.AddHttpClient("tgwebhook").RemoveAllLoggers().AddTypedClient<ITelegramBotClient>(
     httpClient => new TelegramBotClient(botConfigSection.Get<BotConfiguration>()!.BotToken, httpClient));
+
+// Add services to the container.
+
+
+// 長時間執行的服務使用 Singleton
+builder.Services.AddSingleton<IBotService, BotService>();
+
+// 業務邏輯服務使用 Scoped
 builder.Services.AddScoped<UpdateHandler>();
-builder.Services.AddSingleton<IBrowserHandlers, BrowserHandlers>();
-builder.Services.AddScoped<IBotConfigurationService, BotConfigurationService>();
-builder.Services.AddScoped<IBotService, BotService>();
-builder.Services.AddScoped<ICommonService, CommonService>();
-builder.Services.AddScoped<Cnyes>();
-builder.Services.AddScoped<TradingView>();
-builder.Services.AddScoped<Lazy<TradingView>>();
-builder.Services.AddScoped<Lazy<Cnyes>>();
+// builder.Services.AddScoped<IBotConfigurationService, BotConfigurationService>();
+
+// Lazy延遲載入
+builder.Services.AddLazyScoped<IBrowserHandlers, BrowserHandlers>();
+builder.Services.AddLazyScoped<ICommonService, CommonService>();
+builder.Services.AddLazyScoped<Cnyes>();
+builder.Services.AddLazyScoped<TradingView>();
+
 
 builder.Services.ConfigureTelegramBotMvc();
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -38,8 +46,8 @@ var app = builder.Build();
 //if (app.Environment.IsDevelopment())
 //{
 //}
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 //app.UseHttpsRedirection();
 
