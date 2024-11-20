@@ -1,6 +1,6 @@
 using Telegram.Bot.Types;
 
-namespace TGBot_TW_Stock_Webhook.Dto
+namespace TGBot_TW_Stock_Webhook.Model.DTOs
 {
     public class DeleteMessageDto
     {

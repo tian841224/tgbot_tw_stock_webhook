@@ -5,8 +5,8 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
-using TGBot_TW_Stock_Webhook.Dto;
 using TGBot_TW_Stock_Webhook.Interface;
+using TGBot_TW_Stock_Webhook.Model.DTOs;
 using TGBot_TW_Stock_Webhook.Services.Web;
 
 namespace TGBot_TW_Stock_Webhook.Services;

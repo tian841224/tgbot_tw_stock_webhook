@@ -1,9 +1,9 @@
 using Telegram.Bot;
 using TGBot_TW_Stock_Webhook.Data;
-using TGBot_TW_Stock_Webhook.Dto;
 using TGBot_TW_Stock_Webhook.Extensions;
 using TGBot_TW_Stock_Webhook.Interface;
 using TGBot_TW_Stock_Webhook.Model;
+using TGBot_TW_Stock_Webhook.Model.DTOs;
 using TGBot_TW_Stock_Webhook.Services;
 using TGBot_TW_Stock_Webhook.Services.Web;
 

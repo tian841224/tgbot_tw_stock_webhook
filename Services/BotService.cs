@@ -2,7 +2,6 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
-using TGBot_TW_Stock_Webhook.Dto;
 using TGBot_TW_Stock_Webhook.Interface;
 
 namespace TGBot_TW_Stock_Webhook.Services
