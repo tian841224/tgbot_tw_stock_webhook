@@ -1,14 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace TGBot_TW_Stock_Webhook.Model
+namespace TGBot_TW_Stock_Webhook.Model.Entities
 {
     /// <summary>
     /// 訂閱清單
     /// </summary>
-    public class Subscription
+    public class Subscription : BaseEntity
     {
-        public int Id { get; set; }
-
         [ForeignKey("UserId")]
         public int UserId { get; set; }
 
