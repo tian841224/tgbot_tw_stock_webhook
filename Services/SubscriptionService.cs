@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.Eventing.Reader;
+using Newtonsoft.Json.Linq;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using TGBot_TW_Stock_Webhook.Data;
 using TGBot_TW_Stock_Webhook.Interface;
@@ -22,7 +20,6 @@ namespace TGBot_TW_Stock_Webhook.Services
         private readonly AppDbContext _context = context;
         private readonly IBotService _botService = botService;
 
-
         public async Task Subscription(Message message, string stock, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -33,21 +30,15 @@ namespace TGBot_TW_Stock_Webhook.Services
                 if (user == null) throw new Exception("本帳號無法使用");
 
                 // 判斷是否已經訂閱過
-                var subscription = await _context.Subscriptions.Where(x => x.UserId == user.Id && x.Stock == stock).FirstOrDefaultAsync(cancellationToken);
-                if (subscription != null)
-                {
-                    subscription.IsDelete = false;
-                    _context.Subscriptions.Update(subscription);
-                }
-                else
+                var subscription = await _context.Subscriptions.FirstOrDefaultAsync(x => x.UserId == user.Id && x.Symbol == stock && x.IsDelete == false, cancellationToken);
+                string companyName = string.Empty;
+                if (subscription == null)
                 {
                     // 判斷股票代號是否存在
-                    // https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY?stockNo=0050
                     using var client = new HttpClient();
                     string url = $"https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY?stockNo={stock}";
                     HttpResponseMessage response = await client.GetAsync(url);
                     response.EnsureSuccessStatusCode();
-
                     string jsonString = await response.Content.ReadAsStringAsync();
                     var stockData = JsonSerializer.Deserialize<StockData>(jsonString);
 
@@ -63,11 +54,26 @@ namespace TGBot_TW_Stock_Webhook.Services
                         throw new Exception($"訂閱失敗：{stock}，股票代碼錯誤");
                     }
 
+                    // 查詢股票名稱
+                    url = $"https://www.twse.com.tw/rwd/zh/api/codeQuery?query={stock}";
+                    response = await client.GetAsync(url);
+                    response.EnsureSuccessStatusCode();
+                    // 解析 JSON
+                    var json = JObject.Parse(await response.Content.ReadAsStringAsync());
+                    string firstSuggestion = json["suggestions"][0].ToString();
+                    // 取出公司名
+                    companyName = firstSuggestion.Split('\t')[1];
+
+                    //取得當前使用者訂閱清單
+                    var userSubList = await GetSubscriptionList(user, cancellationToken);
+
                     // 新增訂閱
                     subscription = new Subscription
                     {
                         UserId = user.Id,
-                        Stock = stock,
+                        Serial = (uint)userSubList.Count() + 1,
+                        Symbol = stock,
+                        Name = companyName,
                     };
                     _context.Subscriptions.Add(subscription);
                 }
@@ -87,7 +93,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                     await _botService.SendTextMessageAsync(new MessageDto
                     {
                         Message = message,
-                        Text = $"訂閱成功：{stock}",
+                        Text = $"訂閱成功：{stock}/{companyName}",
                         CancellationToken = cancellationToken,
                     });
                 }
@@ -110,12 +116,21 @@ namespace TGBot_TW_Stock_Webhook.Services
                 if (user == null) throw new Exception("本帳號無法使用");
 
                 // 判斷是否已經訂閱過
-                var subscription = await _context.Subscriptions.Where(x => x.UserId == user.Id && x.Stock == stock).FirstOrDefaultAsync(cancellationToken);
+                var subscription = await _context.Subscriptions.FirstOrDefaultAsync(x => x.UserId == user.Id && x.Symbol == stock,cancellationToken);
                 if (subscription == null) return;
 
                 // 刪除訂閱
                 subscription.IsDelete = true;
                 _context.Subscriptions.Update(subscription);
+
+                // 訂閱清單重新編號
+                var userSubList = await GetSubscriptionList(user, cancellationToken);
+                uint serial = 1;
+                foreach (var item in userSubList)
+                {
+                    item.Serial = serial++;
+                    _context.Subscriptions.Update(item);
+                }
 
                 var count = await _context.SaveChangesAsync(cancellationToken);
                 if (count == 0)
@@ -160,17 +175,17 @@ namespace TGBot_TW_Stock_Webhook.Services
                 if (subscription == null || subscription.Count() == 0)
                 {
                     await _botService.SendTextMessageAsync(
-                   new MessageDto
-                   {
-                       Message = message,
-                       Text = "訂閱清單為空",
-                       CancellationToken = cancellationToken,
-                   });
+                       new MessageDto
+                       {
+                           Message = message,
+                           Text = "訂閱清單為空",
+                           CancellationToken = cancellationToken,
+                       });
                 }
                 else
                 {
                     StringBuilder sb = new StringBuilder();
-                    subscription.ForEach(item => sb.AppendLine($"{item.Id}.{item.Stock}"));
+                    subscription.ForEach(item => sb.AppendLine($"{item.Serial}：{item.Symbol}/{item.Name}"));
 
                     await _botService.SendTextMessageAsync(
                     new MessageDto
@@ -181,9 +196,25 @@ namespace TGBot_TW_Stock_Webhook.Services
                     });
                 }
 
-
                 return subscription;
 
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetSubscriptionList Error");
+                throw new Exception($"GetSubscriptionList：{ex.Message}");
+            }
+        }
+
+        private async Task<List<Subscription>> GetSubscriptionList(User user, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            try
+            {
+                // 判斷是否已經訂閱過
+                var subscription = await _context.Subscriptions.Where(x => x.UserId == user.Id && x.IsDelete == false).ToListAsync(cancellationToken);
+                if(subscription == null) return new List<Subscription>();
+                return subscription;
             }
             catch (Exception ex)
             {
@@ -197,7 +228,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             try
             {
                 // 判斷使用者是否存在
-                var user = await _context.Users.Where(x => x.Id == message.Chat.Id).FirstOrDefaultAsync(cancellationToken);
+                var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == message.Chat.Id,cancellationToken);
                 if (user == null)
                 {
                     user = new User
@@ -207,7 +238,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                     };
                     _context.Users.Add(user);
                     var count = await _context.SaveChangesAsync(cancellationToken);
-                    if(count > 0)
+                    if (count > 0)
                         return user;
                 }
 
@@ -228,7 +259,7 @@ namespace TGBot_TW_Stock_Webhook.Services
 
         private class StockData
         {
-            public string stat { get; set; }
+            public string stat { get; set; } = string.Empty;
             public int total { get; set; }
         }
     }
