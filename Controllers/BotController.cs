@@ -11,6 +11,12 @@ namespace TGBot_TW_Stock_Webhook.Controllers;
 [Route("[controller]")]
 public class BotController(IOptions<BotConfiguration> Config) : ControllerBase
 {
+    [HttpPost("getWebhookInfo")]
+    public async Task<WebhookInfo> GetWebhookInfo([FromServices] ITelegramBotClient bot, CancellationToken ct)
+    {
+        return await bot.GetWebhookInfo(ct);
+    }
+
     [HttpPost("setWebhook")]
     public async Task<string> SetWebHook([FromBody] string token, [FromServices] ITelegramBotClient bot, CancellationToken ct)
     {
