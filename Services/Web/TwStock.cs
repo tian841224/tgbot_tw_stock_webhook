@@ -104,6 +104,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
                 var url = "https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX20";
                 var stockResponse = await FetchDataAsync<TWSEApiResponse>(url, "GetTopVolumeItems");
 
+
                 if (stockResponse?.Data == null || !stockResponse.Data.Any())
                     return new List<StockInfo>();
 
