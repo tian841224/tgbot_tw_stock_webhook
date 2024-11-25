@@ -8,10 +8,13 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
     public class TwStock : ITwStock
     {
         private readonly ILogger<SubscriptionService> _logger;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public TwStock(ILogger<SubscriptionService> logger)
+
+        public TwStock(ILogger<SubscriptionService> logger, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
+            _httpClientFactory = httpClientFactory;
         }
 
         // TODO: 漲跌最多前50清單
@@ -24,9 +27,8 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
             try
             {
                 var url = "https://www.twse.com.tw/rwd/zh/afterTrading/FMTQIK";
-                using var httpClient = new HttpClient();
-                var response = await httpClient.GetStringAsync(url);
-                var stockResponse = JsonSerializer.Deserialize<TWSEApiResponse>(response);
+                var stockResponse = await FetchDataAsync<TWSEApiResponse>(url, "GetDailyMarketInfo");
+
 
                 if (stockResponse?.Data == null || !stockResponse.Data.Any())
                     return new List<DailyMarketInfo>();
@@ -34,10 +36,10 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
                 return stockResponse.Data.Select(row => new DailyMarketInfo
                 {
                     Date = Convert.ToString(row?[0]),
-                    TradingVolume = Convert.ToString(row?[1])?.Replace(",", "").ParseToLong(),
-                    TradingValue = Convert.ToString(row?[2]).ParseToDecimal(),
-                    TransactionCount = Convert.ToString(row?[3]).ParseToInt(),
-                    WeightedIndex = Convert.ToString(row?[4]).ParseToDecimal(),
+                    TradingVolume = Convert.ToString(row?[1]),
+                    TradingValue = Convert.ToString(row?[2]),
+                    TransactionCount = Convert.ToString(row?[3]),
+                    WeightedIndex = Convert.ToString(row?[4]),
                     PointChange = Convert.ToString(row?[5]).ParseToDecimal()
                 }).ToList();
             }
@@ -51,7 +53,6 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
         /// <summary>
         /// 台股收盤資訊
         /// </summary>
-        /// https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date=20241121&type=ALLBUT0999
         public async Task<List<StockInfo>> GetAfterTradingVolume(string? symbol)
         {
             try
@@ -60,9 +61,8 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
                 var date = $"{DateTime.Now.ToString("yyyyMMdd")}";
 
                 var url = $"https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date={date}&type=ALLBUT0999";
-                using var httpClient = new HttpClient();
-                var response = await httpClient.GetStringAsync(url);
-                var stockResponse = JsonSerializer.Deserialize<TWSEApiResponse>(response);
+                var stockResponse = await FetchDataAsync<TWSEApiResponse>(url, "GetAfterTradingVolume");
+
 
                 var stockList = stockResponse?.Tables?[8].Data;
                 if (stockList == null)
@@ -83,7 +83,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
                     PriceChangeValue = Convert.ToString(row?[10]).ParseToDecimal(),
                 }).ToList();
 
-                if(symbol != null)
+                if (symbol != null)
                     return result.Where(x => x.Symbol == symbol).ToList();
                 return result;
             }
@@ -102,9 +102,8 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
             try
             {
                 var url = "https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX20";
-                using var httpClient = new HttpClient();
-                var response = await httpClient.GetStringAsync(url);
-                var stockResponse = JsonSerializer.Deserialize<TWSEApiResponse>(response);
+                var stockResponse = await FetchDataAsync<TWSEApiResponse>(url, "GetTopVolumeItems");
+
 
                 if (stockResponse?.Data == null || !stockResponse.Data.Any())
                     return new List<StockInfo>();
@@ -126,6 +125,24 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
             catch (Exception ex)
             {
                 _logger.LogError($"GetTopVolumeItems: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 取得API資料
+        /// </summary>
+        private async Task<T?> FetchDataAsync<T>(string url, string methodName) where T : class
+        {
+            try
+            {
+                var _httpClient = _httpClientFactory.CreateClient();
+                var response = await _httpClient.GetStringAsync(url);
+                return JsonSerializer.Deserialize<T>(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{methodName} 錯誤: {ex.Message}");
                 throw;
             }
         }
