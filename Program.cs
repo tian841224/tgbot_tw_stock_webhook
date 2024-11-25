@@ -9,7 +9,9 @@ using TGBot_TW_Stock_Webhook.Services.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+// HACK: 暫時性的解決方案
+// UNDONE: 尚未完成的部分
+// FIXME: 需要修復的問題
 
 // Setup bot configuration
 var botConfigSection = builder.Configuration.GetSection("BotConfiguration");
@@ -38,6 +40,7 @@ builder.Services.AddLazyScoped<ICommonService, CommonService>();
 builder.Services.AddLazyScoped<Cnyes>();
 builder.Services.AddLazyScoped<TradingView>();
 builder.Services.AddLazyScoped<ISubscriptionService, SubscriptionService>();
+builder.Services.AddLazyScoped<ITwStock, TwStock>();
 // DB
 builder.Services.AddDbContext<AppDbContext>();
 
