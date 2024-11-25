@@ -26,7 +26,6 @@ if (dbConfig == null)
 {
     throw new InvalidOperationException("appsettings:Database configuration is missing.");
 }
-
 // 長時間執行的服務使用 Singleton
 builder.Services.AddSingleton(dbConfig);
 builder.Services.AddSingleton<IBotService, BotService>();

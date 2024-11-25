@@ -13,22 +13,22 @@
         /// <summary>
         /// 成交股數
         /// </summary>
-        public long? TradingVolume { get; set; }
+        public string? TradingVolume { get; set; }
 
         /// <summary>
         /// 成交金額
         /// </summary>
-        public decimal? TradingValue { get; set; }
+        public string? TradingValue { get; set; }
 
         /// <summary>
         /// 成交筆數
         /// </summary>
-        public int? TransactionCount { get; set; }
+        public string? TransactionCount { get; set; }
 
         /// <summary>
         /// 發行量加權股價指數
         /// </summary>
-        public decimal? WeightedIndex { get; set; }
+        public string? WeightedIndex { get; set; }
 
         /// <summary>
         /// 漲跌點數
