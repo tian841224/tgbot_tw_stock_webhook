@@ -5,7 +5,7 @@ using TGBot_TW_Stock_Webhook.Interface;
 using TGBot_TW_Stock_Webhook.Model;
 using TGBot_TW_Stock_Webhook.Model.DTOs;
 using TGBot_TW_Stock_Webhook.Services;
-using TGBot_TW_Stock_Webhook.Services.Web;
+using TGBot_TW_Stock_Webhook.Services.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +40,8 @@ builder.Services.AddLazyScoped<Cnyes>();
 builder.Services.AddLazyScoped<TradingView>();
 builder.Services.AddLazyScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddLazyScoped<ITwStock, TwStock>();
+builder.Services.AddLazyScoped<ITwStockBot, TwStockBot>();
+
 // DB
 builder.Services.AddDbContext<AppDbContext>();
 

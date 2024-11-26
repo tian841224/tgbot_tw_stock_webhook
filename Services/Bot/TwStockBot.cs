@@ -1,6 +1,10 @@
-﻿using System.Text;
+﻿using ExCSS;
+using System.ServiceModel.Syndication;
+using System.Text;
 using System.Text.Json;
+using System.Xml;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 using TGBot_TW_Stock_Webhook.Extensions;
 using TGBot_TW_Stock_Webhook.Interface;
 using TGBot_TW_Stock_Webhook.Model.DTOs;
@@ -18,7 +22,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
         /// <summary>
         /// 當月市場成交資訊
         /// </summary>
-        public async Task GetDailyMarketInfo(Message message, CancellationToken cancellationToken)
+        public async Task GetDailyMarketInfo(Message message, CancellationToken cancellationToken, int? count)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -31,17 +35,20 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                 if (stockResponse?.Data == null || !stockResponse.Data.Any())
                     return;
 
+                if (count.HasValue)
+                    stockResponse.Data = stockResponse.Data.TakeLast(count.Value).ToList();
+
                 var stringBuilder = new StringBuilder();
 
                 foreach (var row in stockResponse.Data)
                 {
-                    stringBuilder.AppendLine(@$"<b>-{Convert.ToString(row?[0])}-</b>");
-                    stringBuilder.AppendLine(@$"<code>成交股數：{Convert.ToString(row?[1])}</code>");
-                    stringBuilder.AppendLine(@$"<code>成交金額：{Convert.ToString(row?[2])}</code>");
-                    stringBuilder.AppendLine(@$"<code>成交筆數：{Convert.ToString(row?[3])}</code>");
-                    stringBuilder.AppendLine(@$"<code>發行量加權股價指數：{Convert.ToString(row?[4])}</code>");
-                    stringBuilder.AppendLine(@$"<code>漲跌點數：{Convert.ToString(row?[5])}</code>");
-                    stringBuilder.AppendLine(@$"<b>----------</b>");
+                    stringBuilder.AppendLine(@$"<b>{row?[0]}</b><code>");
+                    stringBuilder.AppendLine(@$"成交股數：{row?[1]}");
+                    stringBuilder.AppendLine(@$"成交金額：{row?[2]}");
+                    stringBuilder.AppendLine(@$"成交筆數：{row?[3]}");
+                    stringBuilder.AppendLine(@$"發行量加權股價指數：{row?[4]}");
+                    stringBuilder.AppendLine(@$"漲跌點數：{row?[5]}");
+                    stringBuilder.AppendLine(@$"</code>");
                 }
 
                 await _botClient.SendTextMessageAsync(new MessageDto
@@ -61,7 +68,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
         /// <summary>
         /// 台股收盤資訊
         /// </summary>
-        public async Task<List<StockInfo>> GetAfterTradingVolume(string? symbol)
+        public async Task GetAfterTradingVolume(string symbol, Message message, CancellationToken cancellationToken)
         {
             try
             {
@@ -73,26 +80,37 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
 
                 var stockList = stockResponse?.Tables?[8].Data;
                 if (stockList == null)
-                    return result;
+                    return;
 
-                result = stockList.Select(row => new StockInfo
+                var stockInfo = stockList.Where(x => Convert.ToString(x?[0]) == symbol).FirstOrDefault();
+                var stringBuilder = new StringBuilder();
+
+                // 處理漲跌幅，加入表情符號
+                string upDownSign = Convert.ToString(stockInfo?[9]).ExtractUpDownSign();
+                decimal changeAmount = Convert.ToString(stockInfo?[10]).ParseToDecimal();
+                decimal openPrice = Convert.ToString(stockInfo?[5]).ParseToDecimal();
+
+                string emoji = upDownSign == "+" ? "📈" : upDownSign == "-" ? "📉" : "";
+                // 計算漲跌幅百分比
+                string percentageChange = openPrice != 0 ? $"{(changeAmount / openPrice * 100):F2}%" : "0.00%";
+
+                stringBuilder.AppendLine(@$"<b>{stockInfo?[1]} ({stockInfo?[0]})</b>{emoji}<code>");
+                stringBuilder.AppendLine(@$"成交股數：{stockInfo?[2]}");
+                stringBuilder.AppendLine(@$"成交筆數：{stockInfo?[3]}");
+                stringBuilder.AppendLine(@$"成交金額：{stockInfo?[4]}");
+                stringBuilder.AppendLine(@$"開盤價：{openPrice}");
+                stringBuilder.AppendLine(@$"收盤價：{stockInfo?[8]}");
+                stringBuilder.AppendLine(@$"漲跌幅：{upDownSign}{changeAmount} ({percentageChange})");
+                stringBuilder.AppendLine(@$"最高價：{stockInfo?[6]}");
+                stringBuilder.AppendLine(@$"最低價：{stockInfo?[7]}");
+                stringBuilder.AppendLine(@$"</code>");
+
+                await _botClient.SendTextMessageAsync(new MessageDto
                 {
-                    Symbol = Convert.ToString(row?[0]),
-                    Name = Convert.ToString(row?[1]),
-                    TradingVolume = Convert.ToString(row?[2]),
-                    TransactionCount = Convert.ToString(row?[3]),
-                    TradingValue = Convert.ToString(row?[4]),
-                    OpenPrice = Convert.ToString(row?[5]).ParseToDecimal(),
-                    HighPrice = Convert.ToString(row?[6]).ParseToDecimal(),
-                    LowPrice = Convert.ToString(row?[7]).ParseToDecimal(),
-                    ClosePrice = Convert.ToString(row?[8]).ParseToDecimal(),
-                    UpDownSign = Convert.ToString(row?[9]).ExtractUpDownSign(),
-                    PriceChangeValue = Convert.ToString(row?[10]).ParseToDecimal(),
-                }).ToList();
-
-                if (symbol != null)
-                    return result.Where(x => x.Symbol == symbol).ToList();
-                return result;
+                    Message = message,
+                    Text = stringBuilder.ToString(),
+                    CancellationToken = cancellationToken
+                });
             }
             catch (Exception ex)
             {
@@ -104,7 +122,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
         /// <summary>
         /// 成交量前20股票
         /// </summary>
-        public async Task<List<StockInfo>> GetTopVolumeItems()
+        public async Task GetTopVolumeItems(Message message, CancellationToken cancellationToken)
         {
             try
             {
@@ -112,26 +130,82 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                 var stockResponse = await FetchDataAsync<TWSEApiResponse>(url, "GetTopVolumeItems");
 
                 if (stockResponse?.Data == null || !stockResponse.Data.Any())
-                    return new List<StockInfo>();
+                    return;
 
-                return stockResponse.Data.Select(row => new StockInfo
+                var stringBuilder = new StringBuilder();
+
+                foreach (var row in stockResponse.Data)
                 {
-                    Symbol = Convert.ToString(row?[1]),
-                    Name = Convert.ToString(row?[2]),
-                    TradingVolume = Convert.ToString(row?[3]),
-                    TransactionCount = Convert.ToString(row?[4]),
-                    OpenPrice = Convert.ToString(row?[5]).ParseToDecimal(),
-                    HighPrice = Convert.ToString(row?[6]).ParseToDecimal(),
-                    LowPrice = Convert.ToString(row?[7]).ParseToDecimal(),
-                    ClosePrice = Convert.ToString(row?[8]).ParseToDecimal(),
-                    UpDownSign = Convert.ToString(row?[9]).ExtractUpDownSign(),
-                    PriceChangeValue = Convert.ToString(row?[10]).ParseToDecimal(),
-                }).ToList();
+                    // 處理漲跌幅，加入表情符號
+                    string upDownSign = Convert.ToString(row?[9]).ExtractUpDownSign();
+                    decimal changeAmount = Convert.ToString(row?[10]).ParseToDecimal();
+                    decimal openPrice = Convert.ToString(row?[5]).ParseToDecimal();
+
+                    string emoji = upDownSign == "+" ? "📈" : upDownSign == "-" ? "📉" : "";
+                    // 計算漲跌幅百分比
+                    string percentageChange = openPrice != 0 ? $"{(changeAmount / openPrice * 100):F2}%" : "0.00%";
+
+                    stringBuilder.AppendLine(@$"{emoji}<b>{row?[2]} ({row?[1]})</b><code>");
+                    stringBuilder.AppendLine(@$"成交股數：{row?[3]}");
+                    stringBuilder.AppendLine(@$"成交筆數：{row?[4]}");
+                    stringBuilder.AppendLine(@$"開盤價：{openPrice}");
+                    stringBuilder.AppendLine(@$"收盤價：{row?[8]}");
+                    stringBuilder.AppendLine(@$"漲跌幅：{upDownSign}{changeAmount} ({percentageChange})");
+                    stringBuilder.AppendLine(@$"最高價：{row?[6]}");
+                    stringBuilder.AppendLine(@$"最低價：{row?[7]}");
+                    stringBuilder.AppendLine(@$"</code>");
+                }
+
+                await _botClient.SendTextMessageAsync(new MessageDto
+                {
+                    Message = message,
+                    Text = stringBuilder.ToString(),
+                    CancellationToken = cancellationToken
+                });
             }
             catch (Exception ex)
             {
                 _logger.LogError($"GetTopVolumeItems: {ex.Message}");
                 throw;
+            }
+        }
+
+        public async Task GetStockNews(Message message, CancellationToken cancellationToken, string? symbol)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            try
+            {
+                string url = $"https://tw.stock.yahoo.com/rss?category=tw-market";
+
+                //載入網頁
+                if (!string.IsNullOrEmpty(symbol))
+                    url = $"https://tw.stock.yahoo.com/rss?s={symbol}.TW";
+
+                XmlReader reader = XmlReader.Create(url);
+                SyndicationFeed feed = SyndicationFeed.Load(reader);
+                reader.Close();
+                
+                var InlineList = new List<IEnumerable<InlineKeyboardButton>>();
+                foreach (var item in feed.Items.Take(5))
+                {
+                    InlineList.Add(new[] { InlineKeyboardButton.WithUrl(item.Title.Text, item.Links[0].Uri.ToString()) });
+                }
+
+                InlineKeyboardMarkup inlineKeyboard = new(InlineList);
+                await _botClient.SendTextMessageAsync(new MessageDto
+                {
+                    Message = message,
+                    Text = @$"⚡️{symbol}-即時新聞",
+                    ReplyMarkup = inlineKeyboard,
+                    CancellationToken = cancellationToken
+                });
+
+                _logger.LogInformation("已傳送資訊");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"GetNewsAsync:{ex.Message}");
+                throw new Exception($"GetNewsAsync:{ex.Message}");
             }
         }
 
