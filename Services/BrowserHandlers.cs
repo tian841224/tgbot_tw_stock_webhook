@@ -1,5 +1,4 @@
 ﻿using PuppeteerSharp;
-using System.Linq;
 using TGBot_TW_Stock_Webhook.Interface;
 
 namespace TGBot_TW_Stock_Webhook.Services
@@ -22,7 +21,8 @@ namespace TGBot_TW_Stock_Webhook.Services
             try
             {
                 await InitAsync();
-                await _page!.GoToAsync($"{url}", new NavigationOptions
+
+                await _page.GoToAsync($"{url}", new NavigationOptions
                 {
                     Timeout = (int)_timeout.TotalMilliseconds,
                     WaitUntil =
