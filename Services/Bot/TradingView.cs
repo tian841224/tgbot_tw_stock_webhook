@@ -4,7 +4,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TGBot_TW_Stock_Webhook.Interface;
 
-namespace TGBot_TW_Stock_Webhook.Services.Web
+namespace TGBot_TW_Stock_Webhook.Services.Bot
 {
     public class TradingView
     {

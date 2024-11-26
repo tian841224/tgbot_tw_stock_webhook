@@ -1,29 +1,27 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
+using Telegram.Bot.Types;
 using TGBot_TW_Stock_Webhook.Extensions;
 using TGBot_TW_Stock_Webhook.Interface;
 using TGBot_TW_Stock_Webhook.Model.DTOs;
 
-namespace TGBot_TW_Stock_Webhook.Services.Web
+namespace TGBot_TW_Stock_Webhook.Services.Bot
 {
-    public class TwStock : ITwStock
+    public class TwStockBot(ILogger<TwStockBot> logger, IHttpClientFactory httpClientFactory, IBotService botClien) : ITwStockBot
     {
-        private readonly ILogger<SubscriptionService> _logger;
-        private readonly IHttpClientFactory _httpClientFactory;
-
-
-        public TwStock(ILogger<SubscriptionService> logger, IHttpClientFactory httpClientFactory)
-        {
-            _logger = logger;
-            _httpClientFactory = httpClientFactory;
-        }
+        private readonly ILogger<TwStockBot> _logger = logger;
+        private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+        private readonly IBotService _botClient = botClien;
 
         // TODO: 漲跌最多前50清單
 
         /// <summary>
         /// 當月市場成交資訊
         /// </summary>
-        public async Task<List<DailyMarketInfo>> GetDailyMarketInfo()
+        public async Task GetDailyMarketInfo(Message message, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             try
             {
                 var url = "https://www.twse.com.tw/rwd/zh/afterTrading/FMTQIK";
@@ -31,17 +29,27 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
 
 
                 if (stockResponse?.Data == null || !stockResponse.Data.Any())
-                    return new List<DailyMarketInfo>();
+                    return;
 
-                return stockResponse.Data.Select(row => new DailyMarketInfo
+                var stringBuilder = new StringBuilder();
+
+                foreach (var row in stockResponse.Data)
                 {
-                    Date = Convert.ToString(row?[0]),
-                    TradingVolume = Convert.ToString(row?[1]),
-                    TradingValue = Convert.ToString(row?[2]),
-                    TransactionCount = Convert.ToString(row?[3]),
-                    WeightedIndex = Convert.ToString(row?[4]),
-                    PointChange = Convert.ToString(row?[5]).ParseToDecimal()
-                }).ToList();
+                    stringBuilder.AppendLine(@$"<b>-{Convert.ToString(row?[0])}-</b>");
+                    stringBuilder.AppendLine(@$"<code>成交股數：{Convert.ToString(row?[1])}</code>");
+                    stringBuilder.AppendLine(@$"<code>成交金額：{Convert.ToString(row?[2])}</code>");
+                    stringBuilder.AppendLine(@$"<code>成交筆數：{Convert.ToString(row?[3])}</code>");
+                    stringBuilder.AppendLine(@$"<code>發行量加權股價指數：{Convert.ToString(row?[4])}</code>");
+                    stringBuilder.AppendLine(@$"<code>漲跌點數：{Convert.ToString(row?[5])}</code>");
+                    stringBuilder.AppendLine(@$"<b>----------</b>");
+                }
+
+                await _botClient.SendTextMessageAsync(new MessageDto
+                {
+                    Message = message,
+                    Text = stringBuilder.ToString(),
+                    CancellationToken = cancellationToken
+                });
             }
             catch (Exception ex)
             {
@@ -62,7 +70,6 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
 
                 var url = $"https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date={date}&type=ALLBUT0999";
                 var stockResponse = await FetchDataAsync<TWSEApiResponse>(url, "GetAfterTradingVolume");
-
 
                 var stockList = stockResponse?.Tables?[8].Data;
                 if (stockList == null)
@@ -103,7 +110,6 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
             {
                 var url = "https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX20";
                 var stockResponse = await FetchDataAsync<TWSEApiResponse>(url, "GetTopVolumeItems");
-
 
                 if (stockResponse?.Data == null || !stockResponse.Data.Any())
                     return new List<StockInfo>();
