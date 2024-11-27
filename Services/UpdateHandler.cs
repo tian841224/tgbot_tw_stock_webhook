@@ -7,19 +7,13 @@ using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
 using TGBot_TW_Stock_Webhook.Interface;
 using TGBot_TW_Stock_Webhook.Model.DTOs;
-using TGBot_TW_Stock_Webhook.Services.Bot;
 
 namespace TGBot_TW_Stock_Webhook.Services;
 
-public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logger, IBotService botService, Lazy<TradingView> tradingView, Lazy<Cnyes> cnyes,
-    Lazy<ISubscriptionService> subscriptionService, Lazy<ITwStockBot> twStockBot, ICommandFactory commandFactory)
+public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logger, IBotService botService, ICommandFactory commandFactory)
 {
     private static readonly InputPollOption[] PollOptions = ["Hello", "World!"];
     private readonly IBotService _botService = botService;
-    private readonly Lazy<TradingView> _tradingView = tradingView;
-    private readonly Lazy<Cnyes> _cnyes = cnyes;
-    private readonly Lazy<ISubscriptionService> _subscriptionService = subscriptionService;
-    private readonly Lazy<ITwStockBot> _twStockBot = twStockBot;
     private readonly ICommandFactory _commandFactory = commandFactory;
     public async Task HandleErrorAsync(Exception exception, HandleErrorSource source, CancellationToken cancellationToken)
     {
