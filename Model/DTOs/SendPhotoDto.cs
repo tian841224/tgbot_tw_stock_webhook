@@ -10,6 +10,6 @@ namespace TGBot_TW_Stock_Webhook.Model.DTOs
 
         public string? Caption { get; set; } = null;
 
-        public CancellationToken CancellationToken { get; set; }
+        public required CancellationToken CancellationToken { get; set; }
     }
 }

@@ -8,6 +8,6 @@ namespace TGBot_TW_Stock_Webhook.Model.DTOs
 
         public required Message Reply { get; set; }
 
-        public CancellationToken CancellationToken { get; set; }
+        public required CancellationToken CancellationToken { get; set; }
     }
 }
