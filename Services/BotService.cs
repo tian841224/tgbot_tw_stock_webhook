@@ -1,3 +1,6 @@
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -25,6 +28,18 @@ namespace TGBot_TW_Stock_Webhook.Services
                 replyMarkup: message.ReplyMarkup,
                 parseMode: message.ParseMode ?? ParseMode.Html,
                 cancellationToken: message.CancellationToken);
+        }
+
+        public async Task<Message> SendPhotoAsync(SendPhotoDto dto)
+        {
+            dto.CancellationToken.ThrowIfCancellationRequested();
+
+            return await _botClient.SendPhoto(
+                caption: dto.Caption,
+                chatId: dto.Message.Chat.Id,
+                photo: dto.Photo,
+                parseMode: ParseMode.Html,
+                cancellationToken: dto.CancellationToken);
         }
 
         public async Task<Message> SendHelloMessageAsync(Message message, CancellationToken cancellationToken)

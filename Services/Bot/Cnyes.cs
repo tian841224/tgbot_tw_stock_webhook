@@ -1,23 +1,22 @@
-using System.Text;
 using PuppeteerSharp;
-using Telegram.Bot;
+using System.Text;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using TGBot_TW_Stock_Webhook.Interface;
+using TGBot_TW_Stock_Webhook.Model.DTOs;
 
-namespace TGBot_TW_Stock_Webhook.Services.Web
+namespace TGBot_TW_Stock_Webhook.Services.Bot
 {
     public class Cnyes
     {
-        private readonly ITelegramBotClient _botClient;
+        private readonly IBotService _botClient;
         private readonly ILogger<Cnyes> _logger;
         private readonly IBrowserHandlers _browserHandlers;
         private readonly ICommonService _commonService;
         private string stockUrl = "https://www.cnyes.com/twstock/";
         private WaitForSelectorOptions waitForSelectorOptions = new WaitForSelectorOptions { Visible = true };
 
-        public Cnyes(ITelegramBotClient botClient, ILogger<Cnyes> logger, IBrowserHandlers browserHandlers, ICommonService commonService)
+        public Cnyes(IBotService botClient, ILogger<Cnyes> logger, IBrowserHandlers browserHandlers, ICommonService commonService)
         {
             _botClient = botClient;
             _logger = logger;
@@ -28,11 +27,11 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
         /// <summary>
         /// 取得K線
         /// </summary>
-        /// <param name="stockNumber">股票代號</param>
+        /// <param name="symbol">股票代號</param>
         /// <param name="input">使用者輸入參數</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task GetKlineAsync(string stockNumber, Message message, CancellationToken cancellationToken, string? input = "日K")
+        public async Task GetKlineAsync(int symbol, Message message, CancellationToken cancellationToken, string? input)
         {
             cancellationToken.ThrowIfCancellationRequested();
             await _commonService.RetryAsync(async () =>
@@ -40,7 +39,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
                 try
                 {
                     // 載入網頁
-                    using var page = await _browserHandlers.LoadUrlAsync(stockUrl + stockNumber);
+                    using var page = await _browserHandlers.LoadUrlAsync(stockUrl + symbol);
 
                     // 等待圖表載入，使用 CSS 選擇器
                     await page.WaitForSelectorAsync("div.simple-chart table", waitForSelectorOptions);
@@ -73,12 +72,13 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
 
                     _logger.LogInformation("擷取網站中...");
                     using Stream stream = await chartElement.ScreenshotStreamAsync();
-                    await _botClient.SendPhoto(
-                        caption: $"{stockName}：{input}線圖　💹",
-                        chatId: message.Chat.Id,
-                        photo: InputFile.FromStream(stream),
-                        parseMode: ParseMode.Html,
-                        cancellationToken: cancellationToken);
+                    await _botClient.SendPhotoAsync(new SendPhotoDto
+                    {
+                        Caption = $"{stockName}：{input}線圖　💹",
+                        Message = message,
+                        Photo = InputFile.FromStream(stream),
+                        CancellationToken = cancellationToken
+                    });
                     _logger.LogInformation("已傳送資訊");
                 }
                 catch (Exception ex)
@@ -97,7 +97,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
         /// <param name="stockNumber">股票代號</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task GetDetialPriceAsync(string stockNumber, Message message, CancellationToken cancellationToken)
+        public async Task GetDetailPriceAsync(int symbol, Message message, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             await _commonService.RetryAsync(async () =>
@@ -105,7 +105,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
                 try
                 {
                     // 載入網頁
-                    using var page = await _browserHandlers.LoadUrlAsync(stockUrl + stockNumber);
+                    using var page = await _browserHandlers.LoadUrlAsync(stockUrl + symbol);
 
                     // 股價資訊字典保持不變
                     var InfoDic = new Dictionary<int, string>()
@@ -176,12 +176,14 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
                                             ?? throw new Exception("找不到截圖元素");
                     _logger.LogInformation("擷取網站中...");
                     using Stream stream = await screenshotElement.ScreenshotStreamAsync();
-                    await _botClient.SendPhoto(
-                        caption: chart.ToString(),
-                        chatId: message.Chat.Id,
-                        photo: InputFile.FromStream(stream),
-                        parseMode: ParseMode.Html,
-                        cancellationToken: cancellationToken);
+                    await _botClient.SendPhotoAsync(new SendPhotoDto
+                    {
+                        Caption = chart.ToString(),
+                        Message = message,
+                        Photo = InputFile.FromStream(stream),
+                        CancellationToken = cancellationToken
+                    });
+
                     _logger.LogInformation("已傳送資訊");
                 }
                 catch (Exception ex)
@@ -195,17 +197,17 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
         /// <summary>
         /// 取得績效
         /// </summary>
-        /// <param name="stockNumber">股票代號</param>
+        /// <param name="symbol">股票代號</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task GetPerformanceAsync(string stockNumber, Message message, CancellationToken cancellationToken)
+        public async Task GetPerformanceAsync(int symbol, Message message, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             await _commonService.RetryAsync(async () =>
             {
                 try
                 {
-                    using var page = await _browserHandlers.LoadUrlAsync(stockUrl + stockNumber);
+                    using var page = await _browserHandlers.LoadUrlAsync(stockUrl + symbol);
 
                     // 點選 cookie 提示按鈕
                     var cookiebutton = await page.QuerySelectorAsync("#__next > div._1GCLL > div > button._122qv");
@@ -242,12 +244,13 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
 
                     _logger.LogInformation("擷取網站中...");
                     using var stream = await priceElement.ScreenshotStreamAsync();
-                    await _botClient.SendPhoto(
-                        caption: $"{stockName} 績效表現　✨",
-                        chatId: message.Chat.Id,
-                        photo: InputFile.FromStream(stream),
-                        parseMode: ParseMode.Html,
-                        cancellationToken: cancellationToken);
+                    await _botClient.SendPhotoAsync(new SendPhotoDto
+                    {
+                        Caption = $"{stockName} 績效表現　✨",
+                        Message = message,
+                        Photo = InputFile.FromStream(stream),
+                        CancellationToken = cancellationToken
+                    });
                     _logger.LogInformation("已傳送資訊");
                 }
                 catch (Exception ex)
@@ -261,10 +264,10 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
         /// <summary>
         /// 取得新聞
         /// </summary>
-        /// <param name="stockNumber">股票代號</param>
+        /// <param name="symbol">股票代號</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task GetNewsAsync(string stockNumber, Message message, CancellationToken cancellationToken)
+        public async Task GetNewsAsync(int symbol, Message message, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             await _commonService.RetryAsync(async () =>
@@ -272,7 +275,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
                 try
                 {
                     //載入網頁
-                    using var page = await _browserHandlers.LoadUrlAsync(stockUrl + stockNumber);
+                    using var page = await _browserHandlers.LoadUrlAsync(stockUrl + symbol);
 
                     //拆解元素 - 使用 CSS 選擇器
                     var element = await page.QuerySelectorAsync("div.quote-header h2");
@@ -299,14 +302,15 @@ namespace TGBot_TW_Stock_Webhook.Services.Web
                         if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(text)) continue;
                         InlineList.Add(new[] { InlineKeyboardButton.WithUrl(text, url) });
                     }
-
                     InlineKeyboardMarkup inlineKeyboard = new(InlineList);
-                    var s = inlineKeyboard.InlineKeyboard;
-                    await _botClient.SendMessage(
-                        chatId: message.Chat.Id,
-                        text: @$"⚡️{stockName}-即時新聞",
-                        replyMarkup: inlineKeyboard,
-                        cancellationToken: cancellationToken);
+                    await _botClient.SendTextMessageAsync(new MessageDto
+                    {
+                        Message = message,
+                        Text = @$"⚡️{stockName}-即時新聞",
+                        ReplyMarkup = inlineKeyboard,
+                        CancellationToken = cancellationToken
+                    });
+
                     _logger.LogInformation("已傳送資訊");
                 }
                 catch (Exception ex)

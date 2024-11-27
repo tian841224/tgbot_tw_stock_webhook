@@ -8,6 +8,9 @@ namespace TGBot_TW_Stock_Webhook.Interface
         /// <summary>傳送訊息</summary>
         Task<Message> SendTextMessageAsync(MessageDto dto);
 
+        /// <summary>傳送圖片</summary>
+        Task<Message> SendPhotoAsync(SendPhotoDto dto);
+
         /// <summary>傳送Hello訊息</summary>
         Task<Message> SendHelloMessageAsync(Message message, CancellationToken cancellationToken);
 

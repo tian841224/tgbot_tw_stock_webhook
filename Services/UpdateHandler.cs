@@ -7,19 +7,20 @@ using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
 using TGBot_TW_Stock_Webhook.Interface;
 using TGBot_TW_Stock_Webhook.Model.DTOs;
-using TGBot_TW_Stock_Webhook.Services.Web;
+using TGBot_TW_Stock_Webhook.Services.Bot;
 
 namespace TGBot_TW_Stock_Webhook.Services;
 
 public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logger, IBotService botService, Lazy<TradingView> tradingView, Lazy<Cnyes> cnyes,
-    Lazy<ISubscriptionService> subscriptionService)
+    Lazy<ISubscriptionService> subscriptionService, Lazy<ITwStockBot> twStockBot, ICommandFactory commandFactory)
 {
     private static readonly InputPollOption[] PollOptions = ["Hello", "World!"];
     private readonly IBotService _botService = botService;
     private readonly Lazy<TradingView> _tradingView = tradingView;
     private readonly Lazy<Cnyes> _cnyes = cnyes;
     private readonly Lazy<ISubscriptionService> _subscriptionService = subscriptionService;
-
+    private readonly Lazy<ITwStockBot> _twStockBot = twStockBot;
+    private readonly ICommandFactory _commandFactory = commandFactory;
     public async Task HandleErrorAsync(Exception exception, HandleErrorSource source, CancellationToken cancellationToken)
     {
         _logger.LogInformation("HandleError: {Exception}", exception);
@@ -52,61 +53,38 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
     {
         cancellationToken.ThrowIfCancellationRequested();
         _logger.LogInformation("收到消息類型: {MessageType}", msg.Type);
+
+        Message? reply = null;
         try
         {
-
             if (msg.Text is not { } messageText)
                 return;
 
             var parts = messageText.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-            if (parts.Length == 0)
-                return;
-
             var command = parts[0].ToLowerInvariant();
 
-            switch (command)
+            var cmd = _commandFactory.GetCommand(command);
+            if (cmd == null)
             {
-                case "/start":
-                case "hello":
-                    await _botService.SendHelloMessageAsync(msg, cancellationToken);
-                    break;
-                case "/chart":
-                case "/range":
-                case "/k":
-                case "/v":
-                case "/p":
-                case "/n":
-                    if (parts.Length < 2 || !int.TryParse(parts[1], out _))
-                    {
-                        await _botService.SendErrorMessageAsync(msg, cancellationToken);
-                        return;
-                    }
-                    await ProcessStockCommand(command, parts, msg, cancellationToken);
-                    break;
-                case "/sub":
-                    if (parts.Length < 2 || !int.TryParse(parts[1], out _))
-                    {
-                        await _botService.SendErrorMessageAsync(msg, cancellationToken);
-                        return;
-                    }
-                    await _subscriptionService.Value.Subscription(msg, parts[1], cancellationToken);
-                    break;
-                case "/unsub":
-                    if (parts.Length < 2 || !int.TryParse(parts[1], out _))
-                    {
-                        await _botService.SendErrorMessageAsync(msg, cancellationToken);
-                        return;
-                    }
-                    await _subscriptionService.Value.UnSubscription(msg, parts[1], cancellationToken);
-                    break;
-                case "/list":
-                    await _subscriptionService.Value.GetSubscriptionList(msg, cancellationToken);
-                    break;
-                default:
-                    await _botService.SendErrorMessageAsync(msg, cancellationToken);
-                    break;
+                await _botService.SendErrorMessageAsync(msg, cancellationToken);
+                return;
             }
+
+            string? arg1 = null;
+            string? arg2 = null;
+
+            if (parts.Length == 2)
+            {
+                arg1 = parts[1];
+            }
+            else if (parts.Length == 3)
+            {
+                arg1 = parts[1];
+                arg2 = parts[2];
+            }
+
+            await cmd.ExecuteAsync(msg, cancellationToken, arg1, arg2);
         }
 
         catch (Exception ex)
@@ -114,6 +92,18 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
             _logger.LogError($"Error:{ex.Message}");
             _logger.LogError($"UserId：{msg.Chat.Id}\n" + $"Username：{msg.Chat.Username}\n");
             await _botService.ErrorNotify(msg, ex.Message, cancellationToken);
+        }
+        finally
+        {
+            if (reply != null)
+            {
+                await _botService.DeleteMessageAsync(new DeleteMessageDto
+                {
+                    Message = msg,
+                    Reply = reply,
+                    CancellationToken = cancellationToken
+                });
+            }
         }
     }
 
@@ -134,6 +124,8 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
         return await bot.SendMessage(msg.Chat, usage, parseMode: ParseMode.Html, replyMarkup: new ReplyKeyboardRemove());
     }
 
+    // 範例程式
+#if DEBUG
     async Task<Message> SendPhoto(Message msg)
     {
         await bot.SendChatAction(msg.Chat, ChatAction.UploadPhoto);
@@ -245,71 +237,6 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
         return Task.CompletedTask;
     }
 
-    private async Task ProcessStockCommand(string command, string[] parts, Message message, CancellationToken cancellationToken)
-    {
-        var stockNumber = parts[1];
-        Message reply = new Message();
+#endif
 
-        try
-        {
-            reply = await _botService.SendWaitMessageAsync(message, cancellationToken);
-
-            switch (command)
-            {
-                case "/chart":
-                    await _tradingView.Value.GetChartAsync(stockNumber, message, cancellationToken);
-                    break;
-                case "/range":
-                    var range = parts.Length > 2 ? parts[2] : null;
-                    await _tradingView.Value.GetRangeAsync(stockNumber, message, range, cancellationToken);
-                    break;
-                case "/k":
-                    var kRange = parts.Length > 2 ? GetKRange(parts[2]) : "日K";
-                    await _cnyes.Value.GetKlineAsync(stockNumber, message, cancellationToken, kRange);
-                    break;
-                case "/v":
-                    await _cnyes.Value.GetDetialPriceAsync(stockNumber, message, cancellationToken);
-                    break;
-                case "/p":
-                    await _cnyes.Value.GetPerformanceAsync(stockNumber, message, cancellationToken);
-                    break;
-                case "/n":
-                    await _cnyes.Value.GetNewsAsync(stockNumber, message, cancellationToken);
-                    break;
-            }
-        }
-        catch
-        {
-            throw;
-        }
-        finally
-        {
-            if (reply != null)
-            {
-                await _botService.DeleteMessageAsync(new DeleteMessageDto
-                {
-                    Message = message,
-                    Reply = reply,
-                    CancellationToken = cancellationToken
-                });
-            }
-        }
-    }
-
-    private string GetKRange(string input)
-    {
-        return input.ToLowerInvariant() switch
-        {
-            "h" => "分時",
-            "d" => "日K",
-            "w" => "週K",
-            "m" => "月K",
-            "5m" => "5分",
-            "10m" => "10分",
-            "15m" => "15分",
-            "30m" => "30分",
-            "60m" => "60分",
-            _ => "日K"
-        };
-    }
 }

@@ -30,7 +30,6 @@ namespace TGBot_TW_Stock_Webhook.Services
                 try
                 {
                     await action();
-                    await _browserHandlers.ClosePage();
                     break;
                 }
                 catch (Exception ex)

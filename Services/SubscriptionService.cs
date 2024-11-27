@@ -60,7 +60,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                     response.EnsureSuccessStatusCode();
                     // 解析 JSON
                     var json = JObject.Parse(await response.Content.ReadAsStringAsync());
-                    string firstSuggestion = json["suggestions"][0].ToString();
+                    string firstSuggestion = json?["suggestions"]?[0]?.ToString() ?? string.Empty;
                     // 取出公司名
                     companyName = firstSuggestion.Split('\t')[1];
 
