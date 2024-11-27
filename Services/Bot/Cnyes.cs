@@ -27,11 +27,11 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
         /// <summary>
         /// 取得K線
         /// </summary>
-        /// <param name="stockNumber">股票代號</param>
+        /// <param name="symbol">股票代號</param>
         /// <param name="input">使用者輸入參數</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task GetKlineAsync(string stockNumber, Message message, CancellationToken cancellationToken, string? input = "日K")
+        public async Task GetKlineAsync(int symbol, Message message, CancellationToken cancellationToken, string? input)
         {
             cancellationToken.ThrowIfCancellationRequested();
             await _commonService.RetryAsync(async () =>
@@ -39,7 +39,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                 try
                 {
                     // 載入網頁
-                    using var page = await _browserHandlers.LoadUrlAsync(stockUrl + stockNumber);
+                    using var page = await _browserHandlers.LoadUrlAsync(stockUrl + symbol);
 
                     // 等待圖表載入，使用 CSS 選擇器
                     await page.WaitForSelectorAsync("div.simple-chart table", waitForSelectorOptions);
@@ -97,7 +97,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
         /// <param name="stockNumber">股票代號</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task GetDetailPriceAsync(string stockNumber, Message message, CancellationToken cancellationToken)
+        public async Task GetDetailPriceAsync(int symbol, Message message, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             await _commonService.RetryAsync(async () =>
@@ -105,7 +105,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                 try
                 {
                     // 載入網頁
-                    using var page = await _browserHandlers.LoadUrlAsync(stockUrl + stockNumber);
+                    using var page = await _browserHandlers.LoadUrlAsync(stockUrl + symbol);
 
                     // 股價資訊字典保持不變
                     var InfoDic = new Dictionary<int, string>()
@@ -197,17 +197,17 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
         /// <summary>
         /// 取得績效
         /// </summary>
-        /// <param name="stockNumber">股票代號</param>
+        /// <param name="symbol">股票代號</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task GetPerformanceAsync(string stockNumber, Message message, CancellationToken cancellationToken)
+        public async Task GetPerformanceAsync(int symbol, Message message, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             await _commonService.RetryAsync(async () =>
             {
                 try
                 {
-                    using var page = await _browserHandlers.LoadUrlAsync(stockUrl + stockNumber);
+                    using var page = await _browserHandlers.LoadUrlAsync(stockUrl + symbol);
 
                     // 點選 cookie 提示按鈕
                     var cookiebutton = await page.QuerySelectorAsync("#__next > div._1GCLL > div > button._122qv");
@@ -264,10 +264,10 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
         /// <summary>
         /// 取得新聞
         /// </summary>
-        /// <param name="stockNumber">股票代號</param>
+        /// <param name="symbol">股票代號</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task GetNewsAsync(string stockNumber, Message message, CancellationToken cancellationToken)
+        public async Task GetNewsAsync(int symbol, Message message, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             await _commonService.RetryAsync(async () =>
@@ -275,7 +275,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                 try
                 {
                     //載入網頁
-                    using var page = await _browserHandlers.LoadUrlAsync(stockUrl + stockNumber);
+                    using var page = await _browserHandlers.LoadUrlAsync(stockUrl + symbol);
 
                     //拆解元素 - 使用 CSS 選擇器
                     var element = await page.QuerySelectorAsync("div.quote-header h2");

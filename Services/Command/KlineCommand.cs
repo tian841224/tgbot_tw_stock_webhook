@@ -18,7 +18,7 @@ public class KlineCommand : ICommand
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        string? range = null;
+        string range = "日K";
         if (!string.IsNullOrEmpty(arg))
              range = GetKRange(arg);
 

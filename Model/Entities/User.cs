@@ -15,12 +15,12 @@
         /// <summary>
         /// 是否開啟訂閱
         /// </summary>
-        public required bool SubActive { get; set; }
+        public bool SubActive { get; set; } = false;
 
         /// <summary>
         /// 是否被停用
         /// </summary>
-        public required bool Status { get; set; }
+        public bool Status { get; set; } = true;
 
         public ICollection<Subscription> Subscription { get; set; } = [];
     }

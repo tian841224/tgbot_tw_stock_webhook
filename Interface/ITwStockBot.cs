@@ -6,8 +6,10 @@ namespace TGBot_TW_Stock_Webhook.Interface
     {
         /// <summary> 當月市場成交資訊 </summary>
         Task GetDailyMarketInfo(Message message, CancellationToken cancellationToken, int? count);
+
         /// <summary> 成交量前20股票 </summary>
         Task GetTopVolumeItems(Message message, CancellationToken cancellationToken);
+
         /// <summary> 台股收盤資訊 </summary>
         Task GetAfterTradingVolume(string symbol, Message message, CancellationToken cancellationToken);
 
