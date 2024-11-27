@@ -63,21 +63,33 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
                 return;
             }
 
-            var cmd = _commandFactory.GetCommand(command);
-            if (cmd == null)
+            switch (command)
             {
-                await _botService.SendErrorMessageAsync(msg, cancellationToken);
-                return;
+                case "hello":
+                    await _botService.SendHelloMessageAsync(msg, cancellationToken);
+                    break;
+                case "/use":
+                case "/start":
+                    await Usage(msg);
+                    break;
+                default:
+                    var cmd = _commandFactory.GetCommand(command);
+                    if (cmd == null)
+                    {
+                        await _botService.SendErrorMessageAsync(msg, cancellationToken);
+                        return;
+                    }
+
+                    var (arg1, arg2) = parts.Length switch
+                    {
+                        >= 3 => (parts[1], parts[2]),
+                        2 => (parts[1], null),
+                        _ => (null, null)
+                    };
+
+                    await cmd.ExecuteAsync(msg, cancellationToken, arg1, arg2);
+                    break;
             }
-
-            var (arg1, arg2) = parts.Length switch
-            {
-                >= 3 => (parts[1], parts[2]),
-                2 => (parts[1], null),
-                _ => (null, null)
-            };
-
-            await cmd.ExecuteAsync(msg, cancellationToken, arg1, arg2);
         }
 
         catch (Exception ex)
@@ -103,16 +115,16 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
     async Task<Message> Usage(Message msg)
     {
         const string usage = """
-                <b><u>Bot menu</u></b>:
-                /photo          - send a photo
-                /inline_buttons - send inline buttons
-                /keyboard       - send keyboard buttons
-                /remove         - remove keyboard buttons
-                /request        - request location or contact
-                /inline_mode    - send inline-mode results list
-                /poll           - send a poll
-                /poll_anonymous - send an anonymous poll
-                /throw          - what happens if handler fails
+            <b><u>機器人指令</u></b>:
+            /k      - K線圖表
+            /c      - K線圖表(TradingView)
+            /d      - 股票資訊
+            /p      - 股票績效
+            /n      - 股票新聞
+            /yn     - 股票新聞(Yahoo)
+            /m      - 大盤資訊
+            /i      - 當日收盤資訊
+            /t      - 當日交易量前20
             """;
         return await bot.SendMessage(msg.Chat, usage, parseMode: ParseMode.Html, replyMarkup: new ReplyKeyboardRemove());
     }
