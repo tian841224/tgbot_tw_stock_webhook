@@ -55,8 +55,13 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
                 return;
 
             var parts = messageText.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var command = parts.FirstOrDefault()?.ToLowerInvariant();
 
-            var command = parts[0].ToLowerInvariant();
+            if (command == null)
+            {
+                await _botService.SendErrorMessageAsync(msg, cancellationToken);
+                return;
+            }
 
             var cmd = _commandFactory.GetCommand(command);
             if (cmd == null)
@@ -65,18 +70,12 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
                 return;
             }
 
-            string? arg1 = null;
-            string? arg2 = null;
-
-            if (parts.Length == 2)
+            var (arg1, arg2) = parts.Length switch
             {
-                arg1 = parts[1];
-            }
-            else if (parts.Length == 3)
-            {
-                arg1 = parts[1];
-                arg2 = parts[2];
-            }
+                >= 3 => (parts[1], parts[2]),
+                2 => (parts[1], null),
+                _ => (null, null)
+            };
 
             await cmd.ExecuteAsync(msg, cancellationToken, arg1, arg2);
         }
