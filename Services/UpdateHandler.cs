@@ -30,11 +30,11 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
         {
             { Message: { } message } => OnMessage(message, cancellationToken),
             { EditedMessage: { } message } => OnMessage(message, cancellationToken),
-            { CallbackQuery: { } callbackQuery } => OnCallbackQuery(callbackQuery),
-            { InlineQuery: { } inlineQuery } => OnInlineQuery(inlineQuery),
-            { ChosenInlineResult: { } chosenInlineResult } => OnChosenInlineResult(chosenInlineResult),
-            { Poll: { } poll } => OnPoll(poll),
-            { PollAnswer: { } pollAnswer } => OnPollAnswer(pollAnswer),
+            //{ CallbackQuery: { } callbackQuery } => OnCallbackQuery(callbackQuery),
+            //{ InlineQuery: { } inlineQuery } => OnInlineQuery(inlineQuery),
+            //{ ChosenInlineResult: { } chosenInlineResult } => OnChosenInlineResult(chosenInlineResult),
+            //{ Poll: { } poll } => OnPoll(poll),
+            //{ PollAnswer: { } pollAnswer } => OnPollAnswer(pollAnswer),
             // ChannelPost:
             // EditedChannelPost:
             // ShippingQuery:

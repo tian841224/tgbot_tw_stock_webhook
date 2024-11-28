@@ -22,7 +22,12 @@ namespace TGBot_TW_Stock_Webhook.Services
             {
                 await InitAsync();
 
-                await _page.GoToAsync($"{url}", new NavigationOptions
+                if (_page is null)
+                {
+                    throw new InvalidOperationException("頁面未正確初始化");
+                }
+
+                await _page.GoToAsync(url, new NavigationOptions
                 {
                     Timeout = (int)_timeout.TotalMilliseconds,
                     WaitUntil =

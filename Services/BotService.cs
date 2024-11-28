@@ -1,6 +1,3 @@
-using System.IO;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
