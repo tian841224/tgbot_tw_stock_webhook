@@ -16,15 +16,15 @@ namespace TGBot_TW_Stock_Webhook.Services
             _botClient = botClient;
         }
 
-        public async Task<Message> SendTextMessageAsync(MessageDto message)
+        public async Task<Message> SendTextMessageAsync(SendTextDto dto)
         {
-            message.CancellationToken.ThrowIfCancellationRequested();
+            dto.CancellationToken.ThrowIfCancellationRequested();
             return await _botClient.SendMessage(
-                chatId: message.Message.Chat.Id,
-                text: message.Text,
-                replyMarkup: message.ReplyMarkup,
-                parseMode: message.ParseMode ?? ParseMode.Html,
-                cancellationToken: message.CancellationToken);
+                chatId: dto.Message.Chat.Id,
+                text: dto.Text,
+                replyMarkup: dto.ReplyMarkup,
+                parseMode: dto.ParseMode ?? ParseMode.Html,
+                cancellationToken: dto.CancellationToken);
         }
 
         public async Task<Message> SendPhotoAsync(SendPhotoDto dto)
@@ -42,7 +42,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         public async Task<Message> SendHelloMessageAsync(Message message, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return await SendTextMessageAsync(new MessageDto
+            return await SendTextMessageAsync(new SendTextDto
             {
                 Message = message,
                 Text = $"Hello {message.Chat.FirstName} {message.Chat.LastName}",
@@ -54,7 +54,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         public async Task SendErrorMessageAsync(Message message, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await SendTextMessageAsync(new MessageDto
+            await SendTextMessageAsync(new SendTextDto
             {
                 Message = message,
                 Text = "指令錯誤請重新輸入",
@@ -66,7 +66,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         public async Task<Message> SendWaitMessageAsync(Message message, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return await SendTextMessageAsync(new MessageDto
+            return await SendTextMessageAsync(new SendTextDto
             {
                 Message = message,
                 Text = $"<b>-讀取中，請稍後⏰-</b>",

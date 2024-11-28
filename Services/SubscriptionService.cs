@@ -45,7 +45,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                     // 找不到股票資訊
                     if (stockData?.total == 0)
                     {
-                        await _botService.SendTextMessageAsync(new MessageDto
+                        await _botService.SendTextMessageAsync(new SendTextDto
                         {
                             Message = message,
                             Text = $"訂閱失敗：{stock}，股票代碼錯誤",
@@ -81,7 +81,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                 var count = await _context.SaveChangesAsync(cancellationToken);
                 if (count == 0)
                 {
-                    await _botService.SendTextMessageAsync(new MessageDto
+                    await _botService.SendTextMessageAsync(new SendTextDto
                     {
                         Message = message,
                         Text = $"訂閱失敗：{stock}，使用 /list 指令確認是否已訂閱",
@@ -90,7 +90,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                 }
                 else
                 {
-                    await _botService.SendTextMessageAsync(new MessageDto
+                    await _botService.SendTextMessageAsync(new SendTextDto
                     {
                         Message = message,
                         Text = $"訂閱成功：{stock}/{companyName}",
@@ -135,7 +135,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                 var count = await _context.SaveChangesAsync(cancellationToken);
                 if (count == 0)
                 {
-                    await _botService.SendTextMessageAsync(new MessageDto
+                    await _botService.SendTextMessageAsync(new SendTextDto
                     {
                         Message = message,
                         Text = $"取消訂閱失敗：{stock}，使用 /list 指令確認是否已訂閱",
@@ -144,7 +144,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                 }
                 else
                 {
-                    await _botService.SendTextMessageAsync(new MessageDto
+                    await _botService.SendTextMessageAsync(new SendTextDto
                     {
                         Message = message,
                         Text = $"取消訂閱成功：{stock}",
@@ -175,7 +175,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                 if (subscription == null || subscription.Count() == 0)
                 {
                     await _botService.SendTextMessageAsync(
-                       new MessageDto
+                       new SendTextDto
                        {
                            Message = message,
                            Text = "訂閱清單為空",
@@ -188,7 +188,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                     subscription.ForEach(item => sb.AppendLine($"{item.Serial}：{item.Symbol}/{item.Name}"));
 
                     await _botService.SendTextMessageAsync(
-                    new MessageDto
+                    new SendTextDto
                     {
                         Message = message,
                         Text = sb.ToString(),

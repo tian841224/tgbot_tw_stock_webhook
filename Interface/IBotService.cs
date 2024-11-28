@@ -6,7 +6,7 @@ namespace TGBot_TW_Stock_Webhook.Interface
     public interface IBotService
     {
         /// <summary>傳送訊息</summary>
-        Task<Message> SendTextMessageAsync(MessageDto dto);
+        Task<Message> SendTextMessageAsync(SendTextDto dto);
 
         /// <summary>傳送圖片</summary>
         Task<Message> SendPhotoAsync(SendPhotoDto dto);
