@@ -303,7 +303,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                         InlineList.Add(new[] { InlineKeyboardButton.WithUrl(text, url) });
                     }
                     InlineKeyboardMarkup inlineKeyboard = new(InlineList);
-                    await _botClient.SendTextMessageAsync(new MessageDto
+                    await _botClient.SendTextMessageAsync(new SendTextDto
                     {
                         Message = message,
                         Text = @$"⚡️{stockName}-即時新聞",

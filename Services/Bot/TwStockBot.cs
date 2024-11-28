@@ -51,7 +51,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                     stringBuilder.AppendLine(@$"</code>");
                 }
 
-                await _botClient.SendTextMessageAsync(new MessageDto
+                await _botClient.SendTextMessageAsync(new SendTextDto
                 {
                     Message = message,
                     Text = stringBuilder.ToString(),
@@ -105,7 +105,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                 stringBuilder.AppendLine(@$"最低價：{stockInfo?[7]}");
                 stringBuilder.AppendLine(@$"</code>");
 
-                await _botClient.SendTextMessageAsync(new MessageDto
+                await _botClient.SendTextMessageAsync(new SendTextDto
                 {
                     Message = message,
                     Text = stringBuilder.ToString(),
@@ -156,7 +156,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                     stringBuilder.AppendLine(@$"</code>");
                 }
 
-                await _botClient.SendTextMessageAsync(new MessageDto
+                await _botClient.SendTextMessageAsync(new SendTextDto
                 {
                     Message = message,
                     Text = stringBuilder.ToString(),
@@ -192,7 +192,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                 }
 
                 InlineKeyboardMarkup inlineKeyboard = new(InlineList);
-                await _botClient.SendTextMessageAsync(new MessageDto
+                await _botClient.SendTextMessageAsync(new SendTextDto
                 {
                     Message = message,
                     Text = @$"⚡️{symbol}-即時新聞",
