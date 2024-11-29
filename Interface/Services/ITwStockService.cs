@@ -2,7 +2,7 @@
 
 namespace TGBot_TW_Stock_Webhook.Interface
 {
-    public interface ITwStock
+    public interface ITwStockService
     {
         /// <summary>
         /// 取得成交量前20

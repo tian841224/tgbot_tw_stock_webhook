@@ -11,9 +11,9 @@ using TGBot_TW_Stock_Webhook.Model.DTOs;
 
 namespace TGBot_TW_Stock_Webhook.Services.Bot
 {
-    public class TwStockBot(ILogger<TwStockBot> logger, IHttpClientFactory httpClientFactory, IBotService botClien) : ITwStockBot
+    public class TwStockBotService(ILogger<TwStockBotService> logger, IHttpClientFactory httpClientFactory, IBotService botClien) : ITwStockBotService
     {
-        private readonly ILogger<TwStockBot> _logger = logger;
+        private readonly ILogger<TwStockBotService> _logger = logger;
         private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
         private readonly IBotService _botClient = botClien;
 

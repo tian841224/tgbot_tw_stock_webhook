@@ -2,7 +2,7 @@
 
 namespace TGBot_TW_Stock_Webhook.Interface
 {
-    public interface ITwStockBot
+    public interface ITwStockBotService
     {
         /// <summary> 當月市場成交資訊 </summary>
         Task GetDailyMarketInfo(Message message, CancellationToken cancellationToken, int? count);

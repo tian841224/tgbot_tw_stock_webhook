@@ -3,7 +3,7 @@ using TGBot_TW_Stock_Webhook.Interface;
 
 namespace TGBot_TW_Stock_Webhook.Services
 {
-    public class BrowserHandlers(ILogger<BrowserHandlers> logger) : IBrowserHandlers
+    public class BrowserServicecs(ILogger<BrowserHandlers> logger) : IBrowserHandlers
     {
         private readonly ILogger<BrowserHandlers> _logger = logger;
         private IBrowser? _browser = null;

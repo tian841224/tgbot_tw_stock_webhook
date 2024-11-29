@@ -79,10 +79,9 @@ namespace TGBot_TW_Stock_Webhook.Services
         public async Task DeleteMessageAsync(DeleteMessageDto dto)
         {
             dto.CancellationToken.ThrowIfCancellationRequested();
-            await _botClient.DeleteMessage(
-                chatId: dto.Message.Chat.Id,
-                messageId: dto.Reply.MessageId,
-                cancellationToken: dto.CancellationToken);
+            await _botClient.DeleteMessage(chatId: dto.Message.Chat.Id,
+                                           messageId: dto.Reply.MessageId,
+                                           cancellationToken: dto.CancellationToken);
         }
 
 
