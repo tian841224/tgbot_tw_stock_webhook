@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot.Types;
 using TGBot_TW_Stock_Webhook.Model.Entities;
 
-namespace TGBot_TW_Stock_Webhook.Interface
+namespace TGBot_TW_Stock_Webhook.Interface.Services
 {
     public interface ISubscriptionService
     {

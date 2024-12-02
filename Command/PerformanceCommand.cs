@@ -1,8 +1,8 @@
 ﻿using Telegram.Bot.Types;
-using TGBot_TW_Stock_Webhook.Interface;
+using TGBot_TW_Stock_Webhook.Interface.Services;
 using TGBot_TW_Stock_Webhook.Services.Bot;
 
-namespace TGBot_TW_Stock_Webhook.Services.Command
+namespace TGBot_TW_Stock_Webhook.Command
 {
     public class PerformanceCommand : ICommand
     {

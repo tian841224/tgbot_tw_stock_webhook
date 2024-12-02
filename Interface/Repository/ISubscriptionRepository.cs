@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TGBot_TW_Stock_Webhook.Model.Entities;
 
-namespace TGBot_TW_Stock_Webhook.Interface
+namespace TGBot_TW_Stock_Webhook.Interface.Repository
 {
     public interface ISubscriptionRepository
     {
