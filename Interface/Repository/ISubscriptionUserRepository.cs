@@ -5,15 +5,18 @@ namespace TGBot_TW_Stock_Webhook.Interface.Repository
     public interface ISubscriptionUserRepository
     {
         /// <summary> 使用Id取得資料 </summary>
-        Task<SubscriptionUser?> GetById(int id);
+        Task<SubscriptionUser?> GetByIdAsync(int id);
 
         /// <summary> 使用UserId取得資料 </summary>
-        Task<SubscriptionUser?> GetByUserId(int userId);
+        Task<SubscriptionUser?> GetByUserIdAsync(int userId);
 
         /// <summary> 使用SubscriptionId取得資料 </summary>
-        Task<SubscriptionUser?> GetBySubscriptionId(int subscriptionId);
+        Task<SubscriptionUser?> GetBySubscriptionIdAsync(int subscriptionId);
 
-        /// <summary> 取得全部Subscription </summary>
-        Task<List<SubscriptionUser>> GetAll();
+        /// <summary> 取得全部資料 </summary>
+        Task<List<SubscriptionUser>> GetAllAsync();
+
+        /// <summary> 新增資料 </summary>
+        Task<int> AddAsync(SubscriptionUser subscriptionUser);
     }
 }

@@ -17,7 +17,7 @@ namespace TGBot_TW_Stock_Webhook.Repository
             _context = context;
         }
 
-        public async Task<SubscriptionUser?> GetById(int id)
+        public async Task<SubscriptionUser?> GetByIdAsync(int id)
         {
             try
             {
@@ -30,7 +30,7 @@ namespace TGBot_TW_Stock_Webhook.Repository
             }
         }
 
-        public async Task<SubscriptionUser?> GetByUserId(int userId)
+        public async Task<SubscriptionUser?> GetByUserIdAsync(int userId)
         {
             try
             {
@@ -42,7 +42,7 @@ namespace TGBot_TW_Stock_Webhook.Repository
                 throw;
             }
         }
-        public async Task<SubscriptionUser?> GetBySubscriptionId(int subscriptionId)
+        public async Task<SubscriptionUser?> GetBySubscriptionIdAsync(int subscriptionId)
         {
             try
             {
@@ -55,7 +55,7 @@ namespace TGBot_TW_Stock_Webhook.Repository
             }
         }
 
-        public async Task<List<SubscriptionUser>> GetAll()
+        public async Task<List<SubscriptionUser>> GetAllAsync()
         {
             try
             {
@@ -64,6 +64,20 @@ namespace TGBot_TW_Stock_Webhook.Repository
             catch (Exception ex)
             {
                 _logger.LogError(ex, "GetAll");
+                throw;
+            }
+        }
+
+        public async Task<int> AddAsync(SubscriptionUser subscriptionUser)
+        {
+            try
+            {
+                await _context.SubscriptionUsers.AddAsync(subscriptionUser);
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Add");
                 throw;
             }
         }

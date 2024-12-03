@@ -5,7 +5,7 @@ using TGBot_TW_Stock_Webhook.Model.Entities;
 
 namespace TGBot_TW_Stock_Webhook.Repository
 {
-    public class SubscriptionUserStockRepository: ISubscriptionUserStockRepository
+    public class SubscriptionUserStockRepository : ISubscriptionUserStockRepository
     {
         private readonly ILogger<SubscriptionUserStockRepository> _logger;
 
@@ -17,7 +17,7 @@ namespace TGBot_TW_Stock_Webhook.Repository
             _context = context;
         }
 
-        public async Task<SubscriptionUserStock?> GetById(int id)
+        public async Task<SubscriptionUserStock?> GetByIdAsync(int id)
         {
             try
             {
@@ -30,11 +30,11 @@ namespace TGBot_TW_Stock_Webhook.Repository
             }
         }
 
-        public async Task<SubscriptionUserStock?> GetByUserId(int userId)
+        public async Task<List<SubscriptionUserStock>?> GetByUserIdAsync(int userId)
         {
             try
             {
-                return await _context.SubscriptionUserStocks.FirstOrDefaultAsync(x => x.UserId == userId);
+                return await _context.SubscriptionUserStocks.Where(x => x.UserId == userId).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -42,11 +42,12 @@ namespace TGBot_TW_Stock_Webhook.Repository
                 throw;
             }
         }
-        public async Task<SubscriptionUserStock?> GetBySymbol(string symbol)
+
+        public async Task<List<SubscriptionUserStock>?> GetBySymbolAsync(string symbol)
         {
             try
             {
-                return await _context.SubscriptionUserStocks.FirstOrDefaultAsync(x => x.Symbol == symbol);
+                return await _context.SubscriptionUserStocks.Where(x => x.Symbol == symbol).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -55,7 +56,21 @@ namespace TGBot_TW_Stock_Webhook.Repository
             }
         }
 
-        public async Task<List<SubscriptionUserStock>> GetAll()
+        public async Task<SubscriptionUserStock?> GetByUserIdAndSymbolAsync(int userId, string symbol)
+        {
+            try
+            {
+                return await _context.SubscriptionUserStocks.FirstOrDefaultAsync(x => x.UserId == userId && x.Symbol == symbol);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetByUserIdAndSymbol");
+                throw;
+
+            }
+        }
+
+        public async Task<List<SubscriptionUserStock>> GetAllAsync()
         {
             try
             {
@@ -64,6 +79,34 @@ namespace TGBot_TW_Stock_Webhook.Repository
             catch (Exception ex)
             {
                 _logger.LogError(ex, "GetAll");
+                throw;
+            }
+        }
+
+        public async Task<int> AddAsync(SubscriptionUserStock subscriptionUserStock)
+        {
+            try
+            {
+                await _context.SubscriptionUserStocks.AddAsync(subscriptionUserStock);
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Add");
+                throw;
+            }
+        }
+
+        public async Task<int> DeleteAsync(SubscriptionUserStock subscriptionUserStock)
+        {
+            try
+            {
+                _context.SubscriptionUserStocks.Remove(subscriptionUserStock);
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Delete");
                 throw;
             }
         }

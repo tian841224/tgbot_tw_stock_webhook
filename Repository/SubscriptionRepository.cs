@@ -17,7 +17,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             _context = context;
         }
 
-        public async Task<Subscription?> GetById(int id)
+        public async Task<Subscription?> GetByIdAsync(int id)
         {
             try
             {
@@ -30,11 +30,11 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
         }
 
-        public async Task<List<Subscription>?> GetByItem(SubscriptionItemEnum item)
+        public async Task<Subscription?> GetByItemAsync(SubscriptionItemEnum item)
         {
             try
             {
-                return await _context.Subscriptions.Where(x => x.Item == item).ToListAsync();
+                return await _context.Subscriptions.FirstOrDefaultAsync(x => x.Item == item);
             }
             catch (Exception ex)
             {
@@ -43,7 +43,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
         }
 
-        public async Task<List<Subscription>> GetAll()
+        public async Task<List<Subscription>> GetAllAsync()
         {
             try
             {
@@ -52,6 +52,20 @@ namespace TGBot_TW_Stock_Webhook.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "GetAll");
+                throw;
+            }
+        }
+
+        public async Task<int> AddAsync(Subscription subscription)
+        {
+            try
+            {
+                await _context.Subscriptions.AddAsync(subscription);
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Add");
                 throw;
             }
         }
