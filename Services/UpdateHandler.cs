@@ -5,7 +5,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
-using TGBot_TW_Stock_Webhook.Interface;
+using TGBot_TW_Stock_Webhook.Interface.Services;
 using TGBot_TW_Stock_Webhook.Model.DTOs;
 
 namespace TGBot_TW_Stock_Webhook.Services;
@@ -167,7 +167,9 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
         await bot.SendChatAction(msg.Chat, ChatAction.UploadPhoto);
         await Task.Delay(2000); // simulate a long task
         await using var fileStream = new FileStream("Files/bot.gif", FileMode.Open, FileAccess.Read);
-        return await bot.SendPhoto(msg.Chat, fileStream, caption: "Read https://telegrambots.github.io/book/");
+        return await bot.SendPhoto(msg.Chat,
+                                   fileStream,
+                                   caption: "Read https://telegrambots.github.io/book/");
     }
 
     // Send inline keyboard. You can process responses in OnCallbackQuery handler

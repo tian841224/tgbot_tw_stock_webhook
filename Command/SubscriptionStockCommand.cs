@@ -1,18 +1,17 @@
 ﻿using Telegram.Bot.Types;
-using TGBot_TW_Stock_Webhook.Interface;
-using TGBot_TW_Stock_Webhook.Services.Bot;
+using TGBot_TW_Stock_Webhook.Interface.Services;
 
-namespace TGBot_TW_Stock_Webhook.Services.Command
+namespace TGBot_TW_Stock_Webhook.Command
 {
-    public class NewsCommand : ICommand
+    public class SubscriptionStockCommand : ICommand
     {
-        public string Name => "/n";
-        private readonly Cnyes _cnyes;
+        public string Name => "/sub";
+        private readonly ITwStockBotService _twStockBotService;
         private readonly IBotService _botService;
 
-        public NewsCommand(Cnyes cnyes, IBotService botService)
+        public SubscriptionStockCommand(ITwStockBotService twStockBotService, IBotService botService)
         {
-            _cnyes = cnyes;
+            _twStockBotService = twStockBotService;
             _botService = botService;
         }
 
@@ -21,7 +20,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Command
             cancellationToken.ThrowIfCancellationRequested();
 
             if (!string.IsNullOrEmpty(symbol))
-                await _cnyes.GetNewsAsync(Convert.ToInt16(symbol), message, cancellationToken);
+                await _twStockBotService.SubscriptionStock(message, symbol, cancellationToken);
             else
                 await _botService.SendErrorMessageAsync(message, cancellationToken);
         }

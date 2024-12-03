@@ -1,7 +1,6 @@
-
 using PuppeteerSharp;
 
-namespace TGBot_TW_Stock_Webhook.Interface
+namespace TGBot_TW_Stock_Webhook.Interface.Services
 {
     public interface IBrowserHandlers
     {

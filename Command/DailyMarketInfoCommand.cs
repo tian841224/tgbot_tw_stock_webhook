@@ -1,14 +1,14 @@
 ﻿using Telegram.Bot.Types;
-using TGBot_TW_Stock_Webhook.Interface;
+using TGBot_TW_Stock_Webhook.Interface.Services;
 
-namespace TGBot_TW_Stock_Webhook.Services.Command
+namespace TGBot_TW_Stock_Webhook.Command
 {
     public class DailyMarketInfoCommand : ICommand
     {
         public string Name => "/m";
-        private readonly ITwStockBot _twStockBot;
+        private readonly ITwStockBotService _twStockBot;
 
-        public DailyMarketInfoCommand(ITwStockBot twStockBot)
+        public DailyMarketInfoCommand(ITwStockBotService twStockBot)
         {
             _twStockBot = twStockBot;
         }
