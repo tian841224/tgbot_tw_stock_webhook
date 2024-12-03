@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TGBot_TW_Stock_Webhook.Data;
-using TGBot_TW_Stock_Webhook.Interface;
+using TGBot_TW_Stock_Webhook.Interface.Repository;
 using TGBot_TW_Stock_Webhook.Model.Entities;
 
 namespace TGBot_TW_Stock_Webhook.Services
@@ -20,7 +20,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         {
             try
             {
-                return await _context.Users.Where(x => x.Status == true && x.IsDelete == false && x.SubActive == true && x.Id == id).FirstOrDefaultAsync();
+                return await _context.Users.FirstOrDefaultAsync(x => x.Status == true && x.Id == id);
             }
             catch (Exception ex)
             {
@@ -33,7 +33,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         {
             try
             {
-                return await _context.Users.Where(x => x.Status == true && x.IsDelete == false && x.SubActive == true).ToListAsync();
+                return await _context.Users.Where(x => x.Status == true).ToListAsync();
             }
             catch (Exception ex)
             {

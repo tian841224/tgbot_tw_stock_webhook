@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TGBot_TW_Stock_Webhook.Data;
-using TGBot_TW_Stock_Webhook.Interface;
+using TGBot_TW_Stock_Webhook.Enum;
+using TGBot_TW_Stock_Webhook.Interface.Repository;
 using TGBot_TW_Stock_Webhook.Model.Entities;
 
 namespace TGBot_TW_Stock_Webhook.Services
@@ -20,7 +21,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         {
             try
             {
-                return await _context.Subscriptions.FirstOrDefaultAsync(x => x.IsDelete == false && x.Id == id);
+                return await _context.Subscriptions.FirstOrDefaultAsync(x => x.Id == id);
             }
             catch (Exception ex)
             {
@@ -29,25 +30,24 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
         }
 
-        public async Task<List<Subscription>?> GetByUserId(int userId)
+        public async Task<List<Subscription>?> GetByItem(SubscriptionItemEnum item)
         {
             try
             {
-                return await _context.Subscriptions.Where(x => x.IsDelete == false && x.UserId == userId).ToListAsync();
+                return await _context.Subscriptions.Where(x => x.Item == item).ToListAsync();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "GetByUserId");
+                _logger.LogError(ex, "GetByItem");
                 throw;
             }
         }
-
 
         public async Task<List<Subscription>> GetAll()
         {
             try
             {
-                return await _context.Subscriptions.Where(x => x.IsDelete == false).ToListAsync();
+                return await _context.Subscriptions.Where(x => x.Status == true).ToListAsync();
             }
             catch (Exception ex)
             {
