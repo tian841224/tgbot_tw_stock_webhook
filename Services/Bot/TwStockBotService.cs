@@ -1,8 +1,5 @@
 ﻿using ExCSS;
 using Newtonsoft.Json.Linq;
-using PuppeteerSharp;
-using System;
-using System.Net.Http;
 using System.ServiceModel.Syndication;
 using System.Text;
 using System.Text.Json;
@@ -190,7 +187,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                 XmlReader reader = XmlReader.Create(url);
                 SyndicationFeed feed = SyndicationFeed.Load(reader);
                 reader.Close();
-                
+
                 var InlineList = new List<IEnumerable<InlineKeyboardButton>>();
                 foreach (var item in feed.Items.Take(5))
                 {
@@ -221,7 +218,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                 cancellationToken.ThrowIfCancellationRequested();
                 var result = await _subscriptionService.SubscriptionStock(message, stock, cancellationToken);
 
-                if(result == 0)
+                if (result == 0)
                 {
                     await _botClient.SendTextMessageAsync(new SendTextDto
                     {
@@ -264,7 +261,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var result = await _subscriptionService.UnSubscription(message, stock, cancellationToken);
+                var result = await _subscriptionService.UnSubscriptionStock(message, stock, cancellationToken);
 
                 if (result == 0)
                 {
@@ -292,12 +289,12 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             }
         }
 
-        public async Task GetSubscriptionList(Message message, CancellationToken cancellationToken)
+        public async Task GetSubscriptionStockList(Message message, CancellationToken cancellationToken)
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var subscriptionList = await _subscriptionService.GetSubscriptionList(message, cancellationToken);
+                var subscriptionList = await _subscriptionService.GetSubscriptionStockList(message, cancellationToken);
 
                 if (subscriptionList == null || !subscriptionList.Any())
                 {
@@ -310,10 +307,10 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
 
                     return;
                 }
-                
+
                 var stringBuilder = new StringBuilder();
                 uint num = 1;
-                foreach ( var subscription in subscriptionList)
+                foreach (var subscription in subscriptionList)
                 {
                     // 查詢股票名稱
                     using var client = httpClientFactory.CreateClient();

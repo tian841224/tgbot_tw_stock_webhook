@@ -12,6 +12,6 @@ namespace TGBot_TW_Stock_Webhook.Interface.Services
         Task<int> UnSubscriptionStock(Message message, string stock, CancellationToken cancellationToken);
 
         /// <summary> 取得訂閱清單 </summary>
-        Task<List<SubscriptionUserStock>?> GetSubscriptionList(Message message, CancellationToken cancellationToken);
+        Task<List<SubscriptionUserStock>?> GetSubscriptionStockList(Message message, CancellationToken cancellationToken);
     }
 }

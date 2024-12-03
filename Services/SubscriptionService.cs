@@ -121,7 +121,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
         }
 
-        public async Task<List<SubscriptionUserStock>?> GetSubscriptionList(Message message, CancellationToken cancellationToken)
+        public async Task<List<SubscriptionUserStock>?> GetSubscriptionStockList(Message message, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -137,6 +137,82 @@ namespace TGBot_TW_Stock_Webhook.Services
             {
                 _logger.LogError(ex, "GetSubscriptionList Error");
                 throw new Exception($"GetSubscriptionList：{ex.Message}");
+            }
+        }
+
+        public async Task<int> SubscriptionStock(Message message, string stock, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            try
+            {
+                // 取得使用者
+                var user = await _userRepository.GetByChatIdAsync(message.Chat.Id);
+
+                if (user == null)
+                {
+                    user = new Model.Entities.User
+                    {
+                        UserId = message.Chat.Id,
+                        UserName = message.Chat.Username,
+                        Status = true,
+                    };
+                    await _userRepository.AddAsync(user);
+                }
+
+                if (user.Status == false) throw new Exception("本帳號無法使用");
+
+                // 判斷使用者是否有訂閱個股推送功能
+                var subscription = await _subscriptionRepository.GetByItemAsync(SubscriptionItemEnum.StockInfo);
+
+                if (subscription == null)
+                {
+                    subscription = new Subscription
+                    {
+                        Item = SubscriptionItemEnum.StockInfo,
+                        Description = "個股資訊",
+                        Status = true,
+                    };
+                    await _subscriptionRepository.AddAsync(subscription);
+                }
+
+                var subscriptionUser = await _subscriptionUserRepository.GetBySubscriptionIdAsync(subscription.Id);
+                if (subscriptionUser == null)
+                {
+                    await subscriptionUserRepository.AddAsync(new SubscriptionUser
+                    {
+                        UserId = user.Id,
+                        SubscriptionId = subscription.Id
+                    });
+                }
+
+                var subscriptionUserStock = await _subscriptionUserStockRepository.GetBySymbolAsync(stock);
+                if (subscriptionUserStock == null)
+                {
+                    // 判斷股票代號是否存在
+                    using var client = new HttpClient();
+                    string url = $"https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY?stockNo={stock}";
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    response.EnsureSuccessStatusCode();
+                    string jsonString = await response.Content.ReadAsStringAsync();
+                    var stockData = JsonSerializer.Deserialize<StockData>(jsonString);
+
+                    // 找不到股票資訊
+                    if (stockData?.total == 0)
+                        throw new Exception($"訂閱失敗：{stock}，股票代碼錯誤");
+
+                    return await _subscriptionUserStockRepository.AddAsync(new SubscriptionUserStock
+                    {
+                        UserId = user.Id,
+                        Symbol = stock
+                    });
+                }
+
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Subscription Error");
+                throw;
             }
         }
 
