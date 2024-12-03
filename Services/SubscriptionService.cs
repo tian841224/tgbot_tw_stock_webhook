@@ -96,7 +96,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
         }
 
-        public async Task<int> UnSubscription(Message message, string stock, CancellationToken cancellationToken)
+        public async Task<int> UnSubscriptionStock(Message message, string stock, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
