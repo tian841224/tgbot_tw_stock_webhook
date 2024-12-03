@@ -13,7 +13,7 @@ namespace TGBot_TW_Stock_Webhook.Model.Entities
         [ForeignKey("SubscriptionId")]
         public int SubscriptionId { get; set; }
 
-        public required virtual User User { get; set; }
-        public required virtual Subscription Subscription { get; set; }
+        public virtual User User { get; set; }
+        public virtual Subscription Subscription { get; set; }
     }
 }

@@ -10,12 +10,12 @@ namespace TGBot_TW_Stock_Webhook.Model.Entities
     {
         [Required]
         [ForeignKey("UserId")]
-        public int UserId { get; set; }
+        public required int UserId { get; set; }
 
         [Required]
         /// <summary> 股票代號 </summary>
         public required string Symbol { get; set; }
 
-        public required virtual User User { get; set; }
+        public virtual User User { get; set; }
     }
 }
