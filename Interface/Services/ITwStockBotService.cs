@@ -1,4 +1,5 @@
 ﻿using Telegram.Bot.Types;
+using TGBot_TW_Stock_Webhook.Enum;
 
 namespace TGBot_TW_Stock_Webhook.Interface.Services
 {
@@ -25,5 +26,7 @@ namespace TGBot_TW_Stock_Webhook.Interface.Services
         /// <summary> 取消訂閱股票 </summary>
         Task UnSubscriptionStock(Message message, string stock, CancellationToken cancellationToken);
 
+        /// <summary> 訂閱功能 </summary>
+        Task SubscriptionInfo(Message message, SubscriptionItemEnum subscriptionItem, CancellationToken cancellationToken);
     }
 }

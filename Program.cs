@@ -49,7 +49,8 @@ builder.Services.AddScoped<ICommand, AfterTradingVolumeCommand>();
 builder.Services.AddScoped<ICommand, YahooNewsCommand>();
 builder.Services.AddScoped<ICommand, SubscriptionStockCommand>();
 builder.Services.AddScoped<ICommand, UnSubscriptionStockCommand>();
-builder.Services.AddScoped<ICommand, GetSubscriptionListCommand>();
+builder.Services.AddScoped<ICommand, GetSubscriptionStockListCommand>();
+builder.Services.AddScoped<ICommand, SubscriptionInfoCommand>();
 
 // Lazy延遲載入
 builder.Services.AddLazyScoped<IBrowserHandlers, BrowserService>();

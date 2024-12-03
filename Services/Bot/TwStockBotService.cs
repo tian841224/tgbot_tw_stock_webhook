@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Xml;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using TGBot_TW_Stock_Webhook.Enum;
 using TGBot_TW_Stock_Webhook.Extensions;
 using TGBot_TW_Stock_Webhook.Interface.Services;
 using TGBot_TW_Stock_Webhook.Model.DTOs;
@@ -330,6 +331,39 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                 {
                     Message = message,
                     Text = stringBuilder.ToString(),
+                    CancellationToken = cancellationToken,
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"SubscriptionStock:{ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task SubscriptionInfo(Message message, SubscriptionItemEnum subscriptionItem, CancellationToken cancellationToken)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var subscription = await _subscriptionService.SubscriptionInfo(message, subscriptionItem, cancellationToken);
+
+                if(subscription == 0)
+                {
+                    await _botClient.SendTextMessageAsync(new SendTextDto
+                    {
+                        Message = message,
+                        Text = $"訂閱 {subscriptionItem.GetDescription()} 失敗",
+                        CancellationToken = cancellationToken,
+                    });
+
+                    return;
+                }
+
+                await _botClient.SendTextMessageAsync(new SendTextDto
+                {
+                    Message = message,
+                    Text = $"訂閱 {subscriptionItem.GetDescription()} 成功",
                     CancellationToken = cancellationToken,
                 });
             }
