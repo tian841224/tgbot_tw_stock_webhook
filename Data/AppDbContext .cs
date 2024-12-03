@@ -13,7 +13,8 @@ namespace TGBot_TW_Stock_Webhook.Data
         public required DbSet<User> Users { get; set; } = null!;
         public DbSet<Subscription> Subscriptions { get; set; } = null!;
         public DbSet<NotificationHistory> NotificationHistorys { get; set; } = null!;
-
+        public DbSet<SubscriptionUser> SubscriptionUsers { get; set; } = null!;
+        public DbSet<SubscriptionUserStock> SubscriptionUserStocks { get; set; } = null!;
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             // 判斷使用何者資料庫

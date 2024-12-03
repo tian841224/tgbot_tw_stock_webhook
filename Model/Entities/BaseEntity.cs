@@ -1,14 +1,16 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace TGBot_TW_Stock_Webhook.Model.Entities
 {
-    public class BaseEntity
+    public abstract class BaseEntity
     {
         /// <summary>
         /// ID
         /// </summary>
         [Key]
-        [Required]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public virtual int Id { get; set; }
 
         /// <summary>
@@ -22,11 +24,5 @@ namespace TGBot_TW_Stock_Webhook.Model.Entities
         /// </summary>
         [Required]
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
-
-        /// <summary>
-        /// 刪除狀態
-        /// </summary>
-        [Required]
-        public bool IsDelete { get; set; } = false;
     }
 }

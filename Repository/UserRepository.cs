@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TGBot_TW_Stock_Webhook.Data;
-using TGBot_TW_Stock_Webhook.Interface;
+using TGBot_TW_Stock_Webhook.Interface.Repository;
 using TGBot_TW_Stock_Webhook.Model.Entities;
 
 namespace TGBot_TW_Stock_Webhook.Services
@@ -16,11 +16,11 @@ namespace TGBot_TW_Stock_Webhook.Services
             _context = context;
         }
 
-        public async Task<User?> GetById(int id)
+        public async Task<User?> GetByIdAsync(int id)
         {
             try
             {
-                return await _context.Users.Where(x => x.Status == true && x.IsDelete == false && x.SubActive == true && x.Id == id).FirstOrDefaultAsync();
+                return await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
             }
             catch (Exception ex)
             {
@@ -29,15 +29,42 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
         }
 
-        public async Task<List<User>> GetAll()
+        public async Task<User?> GetByChatIdAsync(long chatId)
         {
             try
             {
-                return await _context.Users.Where(x => x.Status == true && x.IsDelete == false && x.SubActive == true).ToListAsync();
+                return await _context.Users.FirstOrDefaultAsync(x => x.UserId == chatId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetById");
+                throw;
+            }
+        }
+
+        public async Task<List<User>> GetAllAsync()
+        {
+            try
+            {
+                return await _context.Users.ToListAsync();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "GetAll");
+                throw;
+            }
+        }
+
+        public async Task<int> AddAsync(User user)
+        {
+            try
+            {
+                await _context.Users.AddAsync(user);
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Add");
                 throw;
             }
         }

@@ -1,15 +1,15 @@
 ﻿using Telegram.Bot.Types;
-using TGBot_TW_Stock_Webhook.Interface;
+using TGBot_TW_Stock_Webhook.Interface.Services;
 
-namespace TGBot_TW_Stock_Webhook.Services.Command
+namespace TGBot_TW_Stock_Webhook.Command
 {
     public class AfterTradingVolumeCommand : ICommand
     {
         public string Name => "/i";
-        private readonly ITwStockBot _twStockBot;
+        private readonly ITwStockBotService _twStockBot;
         private readonly IBotService _botService;
 
-        public AfterTradingVolumeCommand(ITwStockBot twStockBot, IBotService botService)
+        public AfterTradingVolumeCommand(ITwStockBotService twStockBot, IBotService botService)
         {
             _twStockBot = twStockBot;
             _botService = botService;
