@@ -2,9 +2,11 @@ using Telegram.Bot;
 using TGBot_TW_Stock_Webhook.Command;
 using TGBot_TW_Stock_Webhook.Data;
 using TGBot_TW_Stock_Webhook.Extensions;
+using TGBot_TW_Stock_Webhook.Interface.Repository;
 using TGBot_TW_Stock_Webhook.Interface.Services;
 using TGBot_TW_Stock_Webhook.Model;
 using TGBot_TW_Stock_Webhook.Model.DTOs;
+using TGBot_TW_Stock_Webhook.Repository;
 using TGBot_TW_Stock_Webhook.Services;
 using TGBot_TW_Stock_Webhook.Services.Bot;
 
@@ -45,6 +47,9 @@ builder.Services.AddScoped<ICommand, ChartCommand>();
 builder.Services.AddScoped<ICommand, DailyMarketInfoCommand>();
 builder.Services.AddScoped<ICommand, AfterTradingVolumeCommand>();
 builder.Services.AddScoped<ICommand, YahooNewsCommand>();
+builder.Services.AddScoped<ICommand, SubscriptionStockCommand>();
+builder.Services.AddScoped<ICommand, UnSubscriptionStockCommand>();
+builder.Services.AddScoped<ICommand, GetSubscriptionListCommand>();
 
 // Lazy延遲載入
 builder.Services.AddLazyScoped<IBrowserHandlers, BrowserService>();
@@ -54,6 +59,12 @@ builder.Services.AddLazyScoped<TradingView>();
 builder.Services.AddLazyScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddLazyScoped<ITwStockService, TwStockService>();
 builder.Services.AddLazyScoped<ITwStockBotService, TwStockBotService>();
+
+// Repository
+builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+builder.Services.AddScoped<ISubscriptionUserRepository, SubscriptionUserRepository>();
+builder.Services.AddScoped<ISubscriptionUserStockRepository, SubscriptionUserStockRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // DB
 builder.Services.AddDbContext<AppDbContext>();

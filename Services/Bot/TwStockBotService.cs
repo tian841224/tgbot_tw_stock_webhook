@@ -1,4 +1,8 @@
 ﻿using ExCSS;
+using Newtonsoft.Json.Linq;
+using PuppeteerSharp;
+using System;
+using System.Net.Http;
 using System.ServiceModel.Syndication;
 using System.Text;
 using System.Text.Json;
@@ -11,11 +15,13 @@ using TGBot_TW_Stock_Webhook.Model.DTOs;
 
 namespace TGBot_TW_Stock_Webhook.Services.Bot
 {
-    public class TwStockBotService(ILogger<TwStockBotService> logger, IHttpClientFactory httpClientFactory, IBotService botClien) : ITwStockBotService
+    public class TwStockBotService(ILogger<TwStockBotService> logger, IHttpClientFactory httpClientFactory, IBotService botClien,
+        ISubscriptionService subscriptionService) : ITwStockBotService
     {
         private readonly ILogger<TwStockBotService> _logger = logger;
         private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
         private readonly IBotService _botClient = botClien;
+        private readonly ISubscriptionService _subscriptionService = subscriptionService;
 
         // TODO: 漲跌最多前50清單
 
@@ -206,6 +212,134 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             {
                 _logger.LogInformation($"GetNewsAsync:{ex.Message}");
                 throw new Exception($"GetNewsAsync:{ex.Message}");
+            }
+        }
+        public async Task SubscriptionStock(Message message, string stock, CancellationToken cancellationToken)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var result = await _subscriptionService.SubscriptionStock(message, stock, cancellationToken);
+
+                if(result == 0)
+                {
+                    await _botClient.SendTextMessageAsync(new SendTextDto
+                    {
+                        Message = message,
+                        Text = $"訂閱失敗：{stock}，股票代碼錯誤或已訂閱",
+                        CancellationToken = cancellationToken,
+                    });
+
+                    return;
+                }
+
+                // 查詢股票名稱
+                using var client = httpClientFactory.CreateClient();
+                string url = $"https://www.twse.com.tw/rwd/zh/api/codeQuery?query={stock}";
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                // 解析 JSON
+                var json = JObject.Parse(await response.Content.ReadAsStringAsync());
+                string firstSuggestion = json?["suggestions"]?[0]?.ToString() ?? string.Empty;
+                // 取出公司名
+                var companyName = firstSuggestion.Split('\t')[1];
+
+                await _botClient.SendTextMessageAsync(new SendTextDto
+                {
+                    Message = message,
+                    Text = $"訂閱成功：{companyName} ({stock})",
+                    CancellationToken = cancellationToken,
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"SubscriptionStock:{ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task UnSubscriptionStock(Message message, string stock, CancellationToken cancellationToken)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var result = await _subscriptionService.UnSubscription(message, stock, cancellationToken);
+
+                if (result == 0)
+                {
+                    await _botClient.SendTextMessageAsync(new SendTextDto
+                    {
+                        Message = message,
+                        Text = $"取消訂閱失敗：{stock}，股票代碼錯誤或未訂閱",
+                        CancellationToken = cancellationToken,
+                    });
+
+                    return;
+                }
+
+                await _botClient.SendTextMessageAsync(new SendTextDto
+                {
+                    Message = message,
+                    Text = $"取消訂閱成功：{stock}",
+                    CancellationToken = cancellationToken,
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"SubscriptionStock:{ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task GetSubscriptionList(Message message, CancellationToken cancellationToken)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var subscriptionList = await _subscriptionService.GetSubscriptionList(message, cancellationToken);
+
+                if (subscriptionList == null || !subscriptionList.Any())
+                {
+                    await _botClient.SendTextMessageAsync(new SendTextDto
+                    {
+                        Message = message,
+                        Text = $"未訂閱任何股票",
+                        CancellationToken = cancellationToken,
+                    });
+
+                    return;
+                }
+                
+                var stringBuilder = new StringBuilder();
+                uint num = 1;
+                foreach ( var subscription in subscriptionList)
+                {
+                    // 查詢股票名稱
+                    using var client = httpClientFactory.CreateClient();
+                    string url = $"https://www.twse.com.tw/rwd/zh/api/codeQuery?query={subscription.Symbol}";
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    response.EnsureSuccessStatusCode();
+
+                    // 解析 JSON
+                    var json = JObject.Parse(await response.Content.ReadAsStringAsync());
+                    string firstSuggestion = json?["suggestions"]?[0]?.ToString() ?? string.Empty;
+                    // 取出公司名
+                    var companyName = firstSuggestion.Split('\t')[1];
+                    stringBuilder.AppendLine($"<b>{num++}_{companyName} ({subscription.Symbol})</b>");
+                }
+
+                await _botClient.SendTextMessageAsync(new SendTextDto
+                {
+                    Message = message,
+                    Text = stringBuilder.ToString(),
+                    CancellationToken = cancellationToken,
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"SubscriptionStock:{ex.Message}");
+                throw;
             }
         }
 

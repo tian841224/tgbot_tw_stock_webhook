@@ -15,5 +15,15 @@ namespace TGBot_TW_Stock_Webhook.Interface.Services
 
         /// <summary> 個股新聞 </summary>
         Task GetStockNews(Message message, CancellationToken cancellationToken, string? symbol);
+
+        /// <summary> 取得訂閱清單 </summary>
+        Task GetSubscriptionList(Message message, CancellationToken cancellationToken);
+
+        /// <summary> 訂閱股票 </summary>
+        Task SubscriptionStock(Message message, string stock, CancellationToken cancellationToken);
+
+        /// <summary> 取消訂閱股票 </summary>
+        Task UnSubscriptionStock(Message message, string stock, CancellationToken cancellationToken);
+
     }
 }
