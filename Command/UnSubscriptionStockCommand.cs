@@ -20,7 +20,7 @@ namespace TGBot_TW_Stock_Webhook.Command
             cancellationToken.ThrowIfCancellationRequested();
 
             if (!string.IsNullOrEmpty(symbol))
-                await _twStockBotService.UnSubscriptionStock(message, symbol, cancellationToken);
+                await _twStockBotService.UnSubscriptionStockAsync(message, symbol, cancellationToken);
             else
                 await _botService.SendErrorMessageAsync(message, cancellationToken);
         }

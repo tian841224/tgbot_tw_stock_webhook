@@ -7,17 +7,17 @@ namespace TGBot_TW_Stock_Webhook.Interface.Services
         /// <summary>
         /// 取得成交量前20
         /// </summary>
-        Task<List<StockInfo>?> GetTopVolumeItems();
+        Task<List<StockInfo>?> GetTopVolumeItemsAsync();
 
         /// <summary>
         /// 當月市場成交資訊
         /// </summary>
-        Task<DailyMarketInfo?> GetDailyMarketInfo();
+        Task<DailyMarketInfo?> GetDailyMarketInfoAsync();
 
         /// <summary>
         /// 台股收盤資訊
         /// </summary>
         /// <param name="stock">股票代號</param>
-        Task<List<StockInfo>?> GetAfterTradingVolume(string? symbol);
+        Task<List<StockInfo>?> GetAfterTradingVolumeAsync(string? symbol);
     }
 }

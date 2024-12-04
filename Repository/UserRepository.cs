@@ -33,7 +33,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         {
             try
             {
-                return await _context.Users.FirstOrDefaultAsync(x => x.UserId == chatId);
+                return await _context.Users.FirstOrDefaultAsync(x => x.TelegramChatId == chatId);
             }
             catch (Exception ex)
             {

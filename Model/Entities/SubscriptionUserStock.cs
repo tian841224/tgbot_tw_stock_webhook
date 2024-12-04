@@ -13,6 +13,7 @@ namespace TGBot_TW_Stock_Webhook.Model.Entities
         public required int UserId { get; set; }
 
         [Required]
+        [MaxLength(10)]
         /// <summary> 股票代號 </summary>
         public required string Symbol { get; set; }
 

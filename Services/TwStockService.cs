@@ -22,7 +22,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         /// <summary>
         /// 當月市場成交資訊
         /// </summary>
-        public async Task<DailyMarketInfo?> GetDailyMarketInfo()
+        public async Task<DailyMarketInfo?> GetDailyMarketInfoAsync()
         {
             try
             {
@@ -47,7 +47,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"GetDailyMarketInfo: {ex.Message}");
+                _logger.LogError(ex.Message,"GetDailyMarketInfo");
                 throw;
             }
         }
@@ -55,7 +55,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         /// <summary>
         /// 台股收盤資訊
         /// </summary>
-        public async Task<List<StockInfo>?> GetAfterTradingVolume(string? symbol)
+        public async Task<List<StockInfo>?> GetAfterTradingVolumeAsync(string? symbol)
         {
             try
             {
@@ -98,7 +98,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         /// <summary>
         /// 成交量前20股票
         /// </summary>
-        public async Task<List<StockInfo>?> GetTopVolumeItems()
+        public async Task<List<StockInfo>?> GetTopVolumeItemsAsync()
         {
             try
             {
@@ -124,7 +124,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"GetTopVolumeItems: {ex.Message}");
+                _logger.LogError(ex.Message,"GetTopVolumeItems");
                 throw;
             }
         }

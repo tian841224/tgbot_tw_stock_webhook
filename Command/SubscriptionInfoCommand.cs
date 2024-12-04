@@ -24,13 +24,13 @@ namespace TGBot_TW_Stock_Webhook.Command
             switch (arg1)
             {
                 case "t":
-                    await _twStockBotService.SubscriptionInfo(message, SubscriptionItemEnum.TopVolumeItems, cancellationToken);
+                    await _twStockBotService.SubscriptionInfoAsync(message, SubscriptionItemEnum.TopVolumeItems, cancellationToken);
                     break;
                 case "d":
-                    await _twStockBotService.SubscriptionInfo(message, SubscriptionItemEnum.DailyMarketInfo, cancellationToken);
+                    await _twStockBotService.SubscriptionInfoAsync(message, SubscriptionItemEnum.DailyMarketInfo, cancellationToken);
                     break;
                 case "n":
-                    await _twStockBotService.SubscriptionInfo(message, SubscriptionItemEnum.StockNews, cancellationToken);
+                    await _twStockBotService.SubscriptionInfoAsync(message, SubscriptionItemEnum.StockNews, cancellationToken);
                     break;
                 default:
                     await _botService.SendErrorMessageAsync(message, cancellationToken);

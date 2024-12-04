@@ -19,11 +19,24 @@ namespace TGBot_TW_Stock_Webhook.Command
         public async Task ExecuteAsync(Message message, CancellationToken cancellationToken, string? symbol, string? arg = null)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            try
+            {
+                if (!string.IsNullOrEmpty(symbol))
+                {
+                    var count = !string.IsNullOrEmpty(symbol) && Int16.TryParse(symbol, out var result)
+                            ? result
+                            : 1;
 
-            if (!string.IsNullOrEmpty(symbol))
-                await _cnyes.GetPerformanceAsync(Convert.ToInt16(symbol), message, cancellationToken);
-            else
-                await _botService.SendErrorMessageAsync(message, cancellationToken);
+                    await _cnyes.GetPerformanceAsync(count, message, cancellationToken);
+
+                }
+                else
+                    await _botService.SendErrorMessageAsync(message, cancellationToken);
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }

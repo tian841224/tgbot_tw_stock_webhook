@@ -17,10 +17,17 @@ namespace TGBot_TW_Stock_Webhook.Command
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (!string.IsNullOrEmpty(arg1))
-                await _twStockBot.GetDailyMarketInfo(message, cancellationToken, Convert.ToInt16(arg1));
-            else
-                await _twStockBot.GetDailyMarketInfo(message, cancellationToken, 1);
+            try
+            {
+                var count = !string.IsNullOrEmpty(arg1) && Int16.TryParse(arg1, out short result)
+                             ? result
+                              : (short)1;
+                await _twStockBot.GetDailyMarketInfoAsync(message, cancellationToken, count);
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }

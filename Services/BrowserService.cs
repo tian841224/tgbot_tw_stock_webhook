@@ -41,7 +41,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
             catch (Exception ex)
             {
-                await ReleaseBrowser();
+                await ReleaseBrowserAsync();
                 _logger.LogError($"LoadUrlAsync: {ex.Message}");
                 throw new Exception($"LoadUrlAsync : {ex.Message}");
             }
@@ -51,7 +51,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         /// 關閉頁面
         /// </summary>
         /// <returns></returns>
-        public async Task ClosePage()
+        public async Task ClosePageAsync()
         {
             try
             {
@@ -71,12 +71,12 @@ namespace TGBot_TW_Stock_Webhook.Services
         /// 釋放瀏覽器流程
         /// </summary>
         /// <returns></returns>
-        public async Task ReleaseBrowser()
+        public async Task ReleaseBrowserAsync()
         {
             try
             {
-                await ClosePage();
-                await CloseBrowser();
+                await ClosePageAsync();
+                await CloseBrowserAsync();
             }
             catch
             {
@@ -114,7 +114,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
             catch (Exception ex)
             {
-                await ReleaseBrowser();
+                await ReleaseBrowserAsync();
                 _logger.LogError($"InitAsync:{ex.Message}");
                 throw new Exception($"InitAsync:{ex.Message}");
             }
@@ -167,7 +167,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
             catch (Exception ex)
             {
-                await ReleaseBrowser();
+                await ReleaseBrowserAsync();
                 _logger.LogError($"LaunchBrowserAsync:{ex.Message}");
                 throw;
             }
@@ -177,7 +177,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         /// 關閉瀏覽器
         /// </summary>
         /// <returns></returns>
-        private async Task CloseBrowser()
+        private async Task CloseBrowserAsync()
         {
             try
             {

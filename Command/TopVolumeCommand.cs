@@ -24,7 +24,7 @@ namespace TGBot_TW_Stock_Webhook.Command
                 await _botService.SendErrorMessageAsync(message, cancellationToken);
                 return;
             }
-            await _twStockBot.GetTopVolumeItems(message, cancellationToken);
+            await _twStockBot.GetTopVolumeItemsAsync(message, cancellationToken);
         }
     }
 }

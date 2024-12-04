@@ -115,7 +115,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"GetRangeAsync:{ex.Message}");
+                    _logger.LogError(ex.Message,"GetRangeAsync");
                     throw new Exception($"GetRangeAsync:{ex.Message}");
                 }
             }, message, cancellationToken);

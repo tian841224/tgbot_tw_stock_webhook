@@ -16,7 +16,7 @@ namespace TGBot_TW_Stock_Webhook.Command
         public async Task ExecuteAsync(Message message, CancellationToken cancellationToken, string? symbol, string? arg = null)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await _twStockBotService.GetSubscriptionStockList(message, cancellationToken);
+            await _twStockBotService.GetSubscriptionStockListAsync(message, cancellationToken);
         }
     }
 }

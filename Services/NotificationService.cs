@@ -6,7 +6,7 @@ using TGBot_TW_Stock_Webhook.Model.DTOs;
 
 namespace TGBot_TW_Stock_Webhook.Services
 {
-    public class NotificationService : INotificationService
+    public class NotificationService 
     {
         private readonly ILogger<NotificationService> _logger;
         private readonly IUserRepository _userService;
@@ -27,41 +27,41 @@ namespace TGBot_TW_Stock_Webhook.Services
         {
             try
             {
-                var userList = await _userService.GetAll();
-                var stockInfoList = await _twStock.GetAfterTradingVolume(null);
+                var userList = await _userService.GetAllAsync();
+                var stockInfoList = await _twStock.GetAfterTradingVolumeAsync(null);
 
                 foreach (var user in userList)
                 {
                     // 取得使用者訂閱清單
-                    var subList = await _subscriptionRepository.GetByUserId(user.Id);
-                    if (subList == null || subList.Count == 0) continue;
+                    //var subList = await _subscriptionRepository.GetByUserId(user.Id);
+                    //if (subList == null || subList.Count == 0) continue;
 
                     // 取得股票代號
-                    var symbolList = subList.Select(x => x.Symbol).ToList();
+                    //var symbolList = subList.Select(x => x.Symbol).ToList();
                     // 取得股票資訊
-                    var resultList = stockInfoList.Where(x => !string.IsNullOrEmpty(x.Symbol) && symbolList.Contains(x.Symbol)).ToList();
+                    //var resultList = stockInfoList.Where(x => !string.IsNullOrEmpty(x.Symbol) && symbolList.Contains(x.Symbol)).ToList();
 
                     var stringBuilder = new StringBuilder();
 
-                    foreach (var stock in resultList)
-                    {
-                        if (stock == null) continue;
-                        // 處理漲跌幅，加入表情符號
-                        string emoji = stock.UpDownSign == "+" ? "📈" : stock.UpDownSign == "-" ? "📉" : "";
-                        // 計算漲跌幅百分比
-                        string percentageChange = stock.OpenPrice != 0 ? $"{stock.PriceChangeValue / stock.OpenPrice * 100:F2}%" : "0.00%";
+                    //foreach (var stock in resultList)
+                    //{
+                    //    if (stock == null) continue;
+                    //    // 處理漲跌幅，加入表情符號
+                    //    string emoji = stock.UpDownSign == "+" ? "📈" : stock.UpDownSign == "-" ? "📉" : "";
+                    //    // 計算漲跌幅百分比
+                    //    string percentageChange = stock.OpenPrice != 0 ? $"{stock.PriceChangeValue / stock.OpenPrice * 100:F2}%" : "0.00%";
 
-                        stringBuilder.AppendLine(@$"<b>{stock.Name} ({stock.Symbol})</b>{emoji}<code>");
-                        stringBuilder.AppendLine(@$"成交股數：{stock.TradingVolume}");
-                        stringBuilder.AppendLine(@$"成交筆數：{stock.TransactionCount}");
-                        stringBuilder.AppendLine(@$"成交金額：{stock.TradingValue}");
-                        stringBuilder.AppendLine(@$"開盤價：{stock.OpenPrice}");
-                        stringBuilder.AppendLine(@$"收盤價：{stock.ClosePrice}");
-                        stringBuilder.AppendLine(@$"漲跌幅：{stock.UpDownSign}{stock.PriceChangeValue} ({percentageChange})");
-                        stringBuilder.AppendLine(@$"最高價：{stock.HighPrice}");
-                        stringBuilder.AppendLine(@$"最低價：{stock.LowPrice}");
-                        stringBuilder.AppendLine(@$"</code>");
-                    };
+                    //    stringBuilder.AppendLine(@$"<b>{stock.Name} ({stock.Symbol})</b>{emoji}<code>");
+                    //    stringBuilder.AppendLine(@$"成交股數：{stock.TradingVolume}");
+                    //    stringBuilder.AppendLine(@$"成交筆數：{stock.TransactionCount}");
+                    //    stringBuilder.AppendLine(@$"成交金額：{stock.TradingValue}");
+                    //    stringBuilder.AppendLine(@$"開盤價：{stock.OpenPrice}");
+                    //    stringBuilder.AppendLine(@$"收盤價：{stock.ClosePrice}");
+                    //    stringBuilder.AppendLine(@$"漲跌幅：{stock.UpDownSign}{stock.PriceChangeValue} ({percentageChange})");
+                    //    stringBuilder.AppendLine(@$"最高價：{stock.HighPrice}");
+                    //    stringBuilder.AppendLine(@$"最低價：{stock.LowPrice}");
+                    //    stringBuilder.AppendLine(@$"</code>");
+                    //};
 
                     var message = new Message
                     {
@@ -86,8 +86,8 @@ namespace TGBot_TW_Stock_Webhook.Services
         {
             try
             {
-                var userList = await _userService.GetAll();
-                var stockInfoList = await _twStock.GetDailyMarketInfo();
+                var userList = await _userService.GetAllAsync();
+                var stockInfoList = await _twStock.GetDailyMarketInfoAsync();
             }
             catch (Exception ex)
             {

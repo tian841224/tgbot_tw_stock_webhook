@@ -19,9 +19,9 @@ namespace TGBot_TW_Stock_Webhook.Command
             cancellationToken.ThrowIfCancellationRequested();
 
             if (!string.IsNullOrEmpty(symbol))
-                await _twStockBot.GetStockNews(message, cancellationToken, symbol);
+                await _twStockBot.GetStockNewsAsync(message, cancellationToken, symbol);
             else
-                await _twStockBot.GetStockNews(message, cancellationToken, null);
+                await _twStockBot.GetStockNewsAsync(message, cancellationToken, null);
         }
     }
 }

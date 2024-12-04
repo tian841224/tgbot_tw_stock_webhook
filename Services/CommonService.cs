@@ -60,7 +60,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                     }
                     _logger.LogInformation($"等待 {delay.TotalSeconds} 秒後重試...");
                     await Task.Delay(delay, cancellationToken);
-                    await _browserHandlers.ReleaseBrowser();
+                    await _browserHandlers.ReleaseBrowserAsync();
                 }
             }
         }

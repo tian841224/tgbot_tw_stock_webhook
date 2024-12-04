@@ -26,7 +26,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
         /// <summary>
         /// 當月市場成交資訊
         /// </summary>
-        public async Task GetDailyMarketInfo(Message message, CancellationToken cancellationToken, int? count)
+        public async Task GetDailyMarketInfoAsync(Message message, CancellationToken cancellationToken, int? count)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -64,7 +64,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             }
             catch (Exception ex)
             {
-                _logger.LogError($"GetDailyMarketInfo: {ex.Message}");
+                _logger.LogError(ex.Message, "GetDailyMarketInfo");
                 throw;
             }
         }
@@ -72,7 +72,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
         /// <summary>
         /// 台股收盤資訊
         /// </summary>
-        public async Task GetAfterTradingVolume(string symbol, Message message, CancellationToken cancellationToken)
+        public async Task GetAfterTradingVolumeAsync(string symbol, Message message, CancellationToken cancellationToken)
         {
             try
             {
@@ -118,7 +118,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             }
             catch (Exception ex)
             {
-                _logger.LogError($"GetAfterTradingVolume: {ex.Message}");
+                _logger.LogError(ex.Message, "GetAfterTradingVolume");
                 throw;
             }
         }
@@ -126,7 +126,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
         /// <summary>
         /// 成交量前20股票
         /// </summary>
-        public async Task GetTopVolumeItems(Message message, CancellationToken cancellationToken)
+        public async Task GetTopVolumeItemsAsync(Message message, CancellationToken cancellationToken)
         {
             try
             {
@@ -169,12 +169,12 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             }
             catch (Exception ex)
             {
-                _logger.LogError($"GetTopVolumeItems: {ex.Message}");
+                _logger.LogError(ex.Message, "GetTopVolumeItems");
                 throw;
             }
         }
 
-        public async Task GetStockNews(Message message, CancellationToken cancellationToken, string? symbol)
+        public async Task GetStockNewsAsync(Message message, CancellationToken cancellationToken, string? symbol)
         {
             cancellationToken.ThrowIfCancellationRequested();
             try
@@ -208,16 +208,16 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"GetNewsAsync:{ex.Message}");
-                throw new Exception($"GetNewsAsync:{ex.Message}");
+                _logger.LogInformation(ex.Message, "GetNewsAsync");
+                throw;
             }
         }
-        public async Task SubscriptionStock(Message message, string stock, CancellationToken cancellationToken)
+        public async Task SubscriptionStockAsync(Message message, string stock, CancellationToken cancellationToken)
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var result = await _subscriptionService.SubscriptionStock(message, stock, cancellationToken);
+                var result = await _subscriptionService.SubscriptionStockAsync(message, stock, cancellationToken);
 
                 if (result == 0)
                 {
@@ -252,17 +252,17 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"SubscriptionStock:{ex.Message}");
+                _logger.LogInformation(ex.Message, "SubscriptionStock");
                 throw;
             }
         }
 
-        public async Task UnSubscriptionStock(Message message, string stock, CancellationToken cancellationToken)
+        public async Task UnSubscriptionStockAsync(Message message, string stock, CancellationToken cancellationToken)
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var result = await _subscriptionService.UnSubscriptionStock(message, stock, cancellationToken);
+                var result = await _subscriptionService.UnSubscriptionStockAsync(message, stock, cancellationToken);
 
                 if (result == 0)
                 {
@@ -285,17 +285,17 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"SubscriptionStock:{ex.Message}");
+                _logger.LogInformation(ex.Message, "UnSubscriptionStock");
                 throw;
             }
         }
 
-        public async Task GetSubscriptionStockList(Message message, CancellationToken cancellationToken)
+        public async Task GetSubscriptionStockListAsync(Message message, CancellationToken cancellationToken)
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var subscriptionList = await _subscriptionService.GetSubscriptionStockList(message, cancellationToken);
+                var subscriptionList = await _subscriptionService.GetSubscriptionStockListAsync(message, cancellationToken);
 
                 if (subscriptionList == null || !subscriptionList.Any())
                 {
@@ -336,19 +336,19 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"SubscriptionStock:{ex.Message}");
+                _logger.LogInformation(ex.Message, "GetSubscriptionStockList");
                 throw;
             }
         }
 
-        public async Task SubscriptionInfo(Message message, SubscriptionItemEnum subscriptionItem, CancellationToken cancellationToken)
+        public async Task SubscriptionInfoAsync(Message message, SubscriptionItemEnum subscriptionItem, CancellationToken cancellationToken)
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var subscription = await _subscriptionService.SubscriptionInfo(message, subscriptionItem, cancellationToken);
+                var subscription = await _subscriptionService.SubscriptionInfoAsync(message, subscriptionItem, cancellationToken);
 
-                if(subscription == 0)
+                if (subscription == 0)
                 {
                     await _botClient.SendTextMessageAsync(new SendTextDto
                     {
@@ -369,7 +369,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"SubscriptionStock:{ex.Message}");
+                _logger.LogInformation(ex.Message, "SubscriptionInfo");
                 throw;
             }
         }

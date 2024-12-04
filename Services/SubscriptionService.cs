@@ -21,7 +21,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         private readonly ISubscriptionUserRepository _subscriptionUserRepository = subscriptionUserRepository;
         private readonly ISubscriptionUserStockRepository _subscriptionUserStockRepository = subscriptionUserStockRepository;
 
-        public async Task<int> SubscriptionStock(Message message, string stock, CancellationToken cancellationToken)
+        public async Task<int> SubscriptionStockAsync(Message message, string stock, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             try
@@ -33,7 +33,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                 {
                     user = new Model.Entities.User
                     {
-                        UserId = message.Chat.Id,
+                        TelegramChatId = message.Chat.Id,
                         UserName = message.Chat.Username,
                         Status = true,
                     };
@@ -59,7 +59,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                 var subscriptionUser = await _subscriptionUserRepository.GetBySubscriptionIdAsync(subscription.Id);
                 if (subscriptionUser == null)
                 {
-                    await subscriptionUserRepository.AddAsync(new SubscriptionUser
+                    _= subscriptionUserRepository.AddAsync(new SubscriptionUser
                     {
                         UserId = user.Id,
                         SubscriptionId = subscription.Id
@@ -97,7 +97,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
         }
 
-        public async Task<int> UnSubscriptionStock(Message message, string stock, CancellationToken cancellationToken)
+        public async Task<int> UnSubscriptionStockAsync(Message message, string stock, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -122,7 +122,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
         }
 
-        public async Task<List<SubscriptionUserStock>?> GetSubscriptionStockList(Message message, CancellationToken cancellationToken)
+        public async Task<List<SubscriptionUserStock>?> GetSubscriptionStockListAsync(Message message, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -141,7 +141,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
         }
 
-        public async Task<int> SubscriptionInfo(Message message, SubscriptionItemEnum subscriptionItem, CancellationToken cancellationToken)
+        public async Task<int> SubscriptionInfoAsync(Message message, SubscriptionItemEnum subscriptionItem, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             try
@@ -153,7 +153,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                 {
                     user = new Model.Entities.User
                     {
-                        UserId = message.Chat.Id,
+                        TelegramChatId = message.Chat.Id,
                         UserName = message.Chat.Username,
                         Status = true,
                     };

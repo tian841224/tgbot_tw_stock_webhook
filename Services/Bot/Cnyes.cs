@@ -83,7 +83,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogInformation($"GetKlineAsync:{ex.Message}");
+                    _logger.LogInformation(ex.Message, "GetKlineAsync");
                     throw new Exception($"GetKlineAsync:{ex.Message}");
                 }
 
@@ -188,7 +188,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogInformation($"GetDetialPriceAsync:{ex.Message}");
+                    _logger.LogInformation(ex.Message, "GetDetailPriceAsync");
                     throw new Exception($"GetDetialPriceAsync:{ex.Message}");
                 }
             }, message, cancellationToken);
@@ -255,7 +255,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogInformation($"GetPerformanceAsync:{ex.Message}");
+                    _logger.LogInformation(ex.Message, "GetPerformanceAsync");
                     throw new Exception($"GetPerformanceAsync:{ex.Message}");
                 }
             }, message, cancellationToken);
@@ -315,7 +315,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogInformation($"GetNewsAsync:{ex.Message}");
+                    _logger.LogInformation(ex.Message, "GetNewsAsync");
                     throw new Exception($"GetNewsAsync:{ex.Message}");
                 }
             }, message, cancellationToken);
