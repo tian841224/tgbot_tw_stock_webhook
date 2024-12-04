@@ -176,7 +176,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                     await _subscriptionRepository.AddAsync(subscription);
                 }
 
-                var subscriptionUser = await _subscriptionUserRepository.GetBySubscriptionIdAsync(subscription.Id);
+                var subscriptionUser = await _subscriptionUserRepository.GetByUserIdAsync(user.Id);
                 if (subscriptionUser == null)
                 {
                     return await _subscriptionUserRepository.AddAsync(new SubscriptionUser
