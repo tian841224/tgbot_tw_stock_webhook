@@ -1,0 +1,16 @@
+# 基本的 EF Core 套件
+dotnet add package Microsoft.EntityFrameworkCore
+
+# 根據你使用的資料庫選擇對應的套件
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer  # SQL Server
+# 或
+dotnet add package Microsoft.EntityFrameworkCore.Sqlite    # SQLite
+# 或
+dotnet add package Pomelo.EntityFrameworkCore.MySql       # MySQL
+
+# 用於 EF Core 遷移命令的工具
+dotnet add package Microsoft.EntityFrameworkCore.Tools
+
+# 在專案目錄下執行
+dotnet ef migrations add InitialCreate
+dotnet ef database update
