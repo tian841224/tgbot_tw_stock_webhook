@@ -48,7 +48,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message,"GetDailyMarketInfo");
-                throw;
+                throw new Exception($"GetDailyMarketInfo：{ex.Message}");
             }
         }
 
@@ -91,7 +91,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, "GetAfterTradingVolume");
-                throw;
+                throw new Exception($"GetAfterTradingVolume：{ex.Message}");
             }
         }
 
@@ -125,7 +125,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message,"GetTopVolumeItems");
-                throw;
+                throw new Exception($"GetTopVolumeItems：{ex.Message}");
             }
         }
 

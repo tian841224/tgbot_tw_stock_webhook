@@ -81,9 +81,14 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                     });
                     _logger.LogInformation("已傳送資訊");
                 }
+                catch (WaitTaskTimeoutException ex)
+                {
+                    _logger.LogError(ex.Message, "GetKlineAsync");
+                    throw;
+                }
                 catch (Exception ex)
                 {
-                    _logger.LogInformation(ex.Message, "GetKlineAsync");
+                    _logger.LogError(ex.Message, "GetKlineAsync");
                     throw new Exception($"GetKlineAsync:{ex.Message}");
                 }
 
@@ -186,9 +191,14 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
 
                     _logger.LogInformation("已傳送資訊");
                 }
+                catch (WaitTaskTimeoutException ex)
+                {
+                    _logger.LogError(ex.Message, "GetKlineAsync");
+                    throw;
+                }
                 catch (Exception ex)
                 {
-                    _logger.LogInformation(ex.Message, "GetDetailPriceAsync");
+                    _logger.LogError(ex.Message, "GetDetailPriceAsync");
                     throw new Exception($"GetDetialPriceAsync:{ex.Message}");
                 }
             }, message, cancellationToken);
@@ -226,7 +236,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                     await page.WaitForSelectorAsync("div.overview-top", waitForSelectorOptions);
 
                     // 等待數據載入
-                    await page.WaitForSelectorAsync("table.flex tbody", waitForSelectorOptions);
+                    await page.WaitForSelectorAsync("table.flex", waitForSelectorOptions);
 
                     // 拆解元素
                     var element = await page.QuerySelectorAsync("div.quote-header h2")
@@ -253,9 +263,15 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                     });
                     _logger.LogInformation("已傳送資訊");
                 }
+                catch(WaitTaskTimeoutException ex)
+                {
+                    _logger.LogError(ex.Message, "GetPerformanceAsync");
+                    throw;
+                }
                 catch (Exception ex)
                 {
-                    _logger.LogInformation(ex.Message, "GetPerformanceAsync");
+                    _logger.LogError(ex.GetType().Name, "GetPerformanceAsync");
+                    _logger.LogError(ex.Message, "GetPerformanceAsync");
                     throw new Exception($"GetPerformanceAsync:{ex.Message}");
                 }
             }, message, cancellationToken);
@@ -313,9 +329,14 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
 
                     _logger.LogInformation("已傳送資訊");
                 }
+                catch (WaitTaskTimeoutException ex)
+                {
+                    _logger.LogError(ex.Message, "GetKlineAsync");
+                    throw;
+                }
                 catch (Exception ex)
                 {
-                    _logger.LogInformation(ex.Message, "GetNewsAsync");
+                    _logger.LogError(ex.Message, "GetNewsAsync");
                     throw new Exception($"GetNewsAsync:{ex.Message}");
                 }
             }, message, cancellationToken);

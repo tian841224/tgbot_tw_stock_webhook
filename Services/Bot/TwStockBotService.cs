@@ -64,7 +64,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, "GetDailyMarketInfo");
-                throw;
+                throw new Exception($"GetDailyMarketInfo：{ex.Message}");
             }
         }
 
@@ -118,7 +118,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, "GetAfterTradingVolume");
-                throw;
+                throw new Exception($"GetAfterTradingVolume：{ex.Message}");
             }
         }
 
@@ -169,7 +169,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, "GetTopVolumeItems");
-                throw;
+                throw new Exception($"GetTopVolumeItems：{ex.Message}");
             }
         }
 
@@ -207,8 +207,8 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex.Message, "GetNewsAsync");
-                throw;
+                _logger.LogError(ex.Message, "GetNewsAsync");
+                throw new Exception($"GetNewsAsync：{ex.Message}");
             }
         }
         public async Task SubscriptionStockAsync(Message message, string stock, CancellationToken cancellationToken)
@@ -251,8 +251,8 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex.Message, "SubscriptionStock");
-                throw;
+                _logger.LogError(ex.Message, "SubscriptionStock");
+                throw new Exception($"SubscriptionStock：{ex.Message}");
             }
         }
 
@@ -284,8 +284,8 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex.Message, "UnSubscriptionStock");
-                throw;
+                _logger.LogError(ex.Message, "UnSubscriptionStock");
+                throw new Exception($"UnSubscriptionStock：{ex.Message}");
             }
         }
 
@@ -335,8 +335,8 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex.Message, "GetSubscriptionStockList");
-                throw;
+                _logger.LogError(ex.Message, "GetSubscriptionStockList");
+                throw new Exception($"GetSubscriptionStockList：{ex.Message}");
             }
         }
 
@@ -368,8 +368,8 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex.Message, "SubscriptionInfo");
-                throw;
+                _logger.LogError(ex.Message, "SubscriptionInfo");
+                throw new Exception($"SubscriptionInfo：{ex.Message}");
             }
         }
 

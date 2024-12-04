@@ -67,7 +67,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                 }
 
                 var subscriptionUserStock = await _subscriptionUserStockRepository.GetBySymbolAsync(stock);
-                if (subscriptionUserStock == null)
+                if (subscriptionUserStock == null || !subscriptionUserStock.Any())
                 {
                     // 判斷股票代號是否存在
                     using var client = new HttpClient();
@@ -92,8 +92,8 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Subscription Error");
-                throw;
+                _logger.LogError(ex, "SubscriptionStockAsync");
+                throw new Exception($"SubscriptionStockAsync : {ex.Message}");
             }
         }
 
@@ -117,7 +117,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "UnSubscription Error");
+                _logger.LogError(ex, "UnSubscriptionStockAsync");
                 throw new Exception($"UnSubscription：{ex.Message}");
             }
         }
@@ -136,7 +136,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "GetSubscriptionList Error");
+                _logger.LogError(ex, "GetSubscriptionStockListAsync");
                 throw new Exception($"GetSubscriptionList：{ex.Message}");
             }
         }
@@ -191,7 +191,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "SubscriptionInfo");
-                throw;
+                throw new Exception($"SubscriptionInfoAsync：{ex.Message}");
             }
         }
 

@@ -23,7 +23,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             _botService = botService;
         }
 
-        public async Task SendStockInfo()
+        public async Task SendStockInfoAsync()
         {
             try
             {
@@ -79,10 +79,11 @@ namespace TGBot_TW_Stock_Webhook.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, "SendStockInfo");
+                throw new Exception($"SendStockInfoAsync : {ex.Message}");
             }
         }
 
-        public async Task SendDailyMarketInfo()
+        public async Task SendDailyMarketInfoAsync()
         {
             try
             {
@@ -92,10 +93,11 @@ namespace TGBot_TW_Stock_Webhook.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, "SendDailyMarketInfo");
+                throw new Exception($"SendDailyMarketInfoAsync : {ex.Message}");
             }
         }
 
-        public async Task SendTopVolumeItems()
+        public async Task SendTopVolumeItemsAsync()
         {
             try
             {
@@ -103,10 +105,11 @@ namespace TGBot_TW_Stock_Webhook.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, "SendTopVolumeItems");
+                throw new Exception($"SendTopVolumeItemsAsync : {ex.Message}");
             }
         }
 
-        public async Task SendStockNews()
+        public async Task SendStockNewsAsync()
         {
             try
             {
@@ -115,6 +118,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, "SendStockNews");
+                throw new Exception($"SendStockNewsAsync : {ex.Message}");
             }
         }
     }

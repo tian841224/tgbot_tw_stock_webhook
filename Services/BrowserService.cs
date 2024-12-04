@@ -42,7 +42,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             catch (Exception ex)
             {
                 await ReleaseBrowserAsync();
-                _logger.LogError($"LoadUrlAsync: {ex.Message}");
+                _logger.LogError(ex.Message,"LoadUrlAsync");
                 throw new Exception($"LoadUrlAsync : {ex.Message}");
             }
         }
@@ -61,7 +61,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"ClosePage: {ex.Message}");
+                _logger.LogError(ex.Message, "ClosePage");
                 throw new Exception($"ClosePage: {ex.Message}");
 
             }
@@ -92,6 +92,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         {
             try
             {
+                await ReleaseBrowserAsync();
                 if (_browser == null)
                     await LaunchBrowserAsync();
 
@@ -115,7 +116,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             catch (Exception ex)
             {
                 await ReleaseBrowserAsync();
-                _logger.LogError($"InitAsync:{ex.Message}");
+                _logger.LogError(ex.Message, "InitAsync");
                 throw new Exception($"InitAsync:{ex.Message}");
             }
         }
@@ -168,7 +169,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             catch (Exception ex)
             {
                 await ReleaseBrowserAsync();
-                _logger.LogError($"LaunchBrowserAsync:{ex.Message}");
+                _logger.LogError(ex.Message, "LaunchBrowserAsync");
                 throw;
             }
         }
@@ -188,7 +189,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"CloseBrowser: {ex.Message}");
+                _logger.LogError(ex.Message, "CloseBrowser");
                 throw new Exception($"CloseBrowser: {ex.Message}");
             }
         }

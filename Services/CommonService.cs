@@ -1,3 +1,4 @@
+using PuppeteerSharp;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -25,18 +26,17 @@ namespace TGBot_TW_Stock_Webhook.Services
         public async Task RetryAsync(Func<Task> action, Message message, CancellationToken cancellationToken)
         {
             int retryCount = 0;
-            while (retryCount < maxRetries)
+            while (retryCount++ < maxRetries)
             {
                 try
                 {
                     await action();
                     break;
                 }
-                catch (Exception ex)
+                catch (WaitTaskTimeoutException ex)
                 {
-                    retryCount++;
                     _logger.LogWarning($"嘗試 {retryCount} 次失敗：{ex.Message}");
-                    if (retryCount > maxRetries)
+                    if (retryCount >= maxRetries)
                     {
                         _logger.LogInformation($"已達最大重試次數 ({maxRetries})，拋出例外。");
                         await _botClient.SendMessage(
@@ -55,12 +55,11 @@ namespace TGBot_TW_Stock_Webhook.Services
                             int endIndex = methodName.IndexOf('>');
                             methodName = methodName.Substring(startIndex, endIndex - startIndex);
                         }
-
+                        await _browserHandlers.ReleaseBrowserAsync();
                         throw new Exception($"{methodName}：{ex.Message}");
                     }
                     _logger.LogInformation($"等待 {delay.TotalSeconds} 秒後重試...");
                     await Task.Delay(delay, cancellationToken);
-                    await _browserHandlers.ReleaseBrowserAsync();
                 }
             }
         }

@@ -113,6 +113,11 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                     _logger.LogInformation("已傳送資訊");
                     #endregion
                 }
+                catch (WaitTaskTimeoutException ex)
+                {
+                    _logger.LogError(ex.Message, "GetKlineAsync");
+                    throw;
+                }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex.Message,"GetRangeAsync");
