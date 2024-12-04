@@ -59,7 +59,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                 var subscriptionUser = await _subscriptionUserRepository.GetBySubscriptionIdAsync(subscription.Id);
                 if (subscriptionUser == null)
                 {
-                    _= subscriptionUserRepository.AddAsync(new SubscriptionUser
+                    _= _subscriptionUserRepository.AddAsync(new SubscriptionUser
                     {
                         UserId = user.Id,
                         SubscriptionId = subscription.Id
@@ -179,7 +179,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                 var subscriptionUser = await _subscriptionUserRepository.GetBySubscriptionIdAsync(subscription.Id);
                 if (subscriptionUser == null)
                 {
-                    return await subscriptionUserRepository.AddAsync(new SubscriptionUser
+                    return await _subscriptionUserRepository.AddAsync(new SubscriptionUser
                     {
                         UserId = user.Id,
                         SubscriptionId = subscription.Id
