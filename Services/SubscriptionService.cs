@@ -56,7 +56,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                     await _subscriptionRepository.AddAsync(subscription);
                 }
 
-                var subscriptionUser = await _subscriptionUserRepository.GetBySubscriptionIdAsync(subscription.Id);
+                var subscriptionUser = await _subscriptionUserRepository.GetByUserIdAndSubscriptionIdAsync(user.Id,subscription.Id);
                 if (subscriptionUser == null)
                 {
                     _= _subscriptionUserRepository.AddAsync(new SubscriptionUser
@@ -66,8 +66,8 @@ namespace TGBot_TW_Stock_Webhook.Services
                     });
                 }
 
-                var subscriptionUserStock = await _subscriptionUserStockRepository.GetBySymbolAsync(stock);
-                if (subscriptionUserStock == null || !subscriptionUserStock.Any())
+                var subscriptionUserStock = await _subscriptionUserStockRepository.GetByUserIdAndSymbolAsync(user.Id, stock);
+                if (subscriptionUserStock == null)
                 {
                     // 判斷股票代號是否存在
                     using var client = new HttpClient();
@@ -176,7 +176,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                     await _subscriptionRepository.AddAsync(subscription);
                 }
 
-                var subscriptionUser = await _subscriptionUserRepository.GetByUserIdAsync(user.Id);
+                var subscriptionUser = await _subscriptionUserRepository.GetByUserIdAndSubscriptionIdAsync(user.Id, subscription.Id);
                 if (subscriptionUser == null)
                 {
                     return await _subscriptionUserRepository.AddAsync(new SubscriptionUser
