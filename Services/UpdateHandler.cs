@@ -46,14 +46,15 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
     private async Task OnMessage(Message msg, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        _logger.LogInformation("收到消息類型: {MessageType}", msg.Type);
+        //_logger.LogInformation("收到消息類型: {MessageType}", msg.Type);
 
         Message? reply = null;
         try
         {
             if (msg.Text is not { } messageText)
                 return;
-
+            _logger.LogInformation($"Username：{msg.Chat.Username}");
+            _logger.LogInformation($"Message：{msg.Text}");
             var parts = messageText.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var command = parts.FirstOrDefault()?.ToLowerInvariant();
 
