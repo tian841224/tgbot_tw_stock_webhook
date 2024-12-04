@@ -53,6 +53,7 @@ builder.Services.AddScoped<ICommand, SubscriptionStockCommand>();
 builder.Services.AddScoped<ICommand, UnSubscriptionStockCommand>();
 builder.Services.AddScoped<ICommand, GetSubscriptionStockListCommand>();
 builder.Services.AddScoped<ICommand, SubscriptionInfoCommand>();
+builder.Services.AddScoped<ICommand, UnSubscriptionInfoCommand>();
 
 // Lazy延遲載入
 builder.Services.AddLazyScoped<IBrowserHandlers, BrowserService>();

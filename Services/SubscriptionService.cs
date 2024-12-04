@@ -195,6 +195,46 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
         }
 
+        public async Task<int> UnSubscriptionInfoAsync(Message message, SubscriptionItemEnum subscriptionItem, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            try
+            {
+                // 取得使用者
+                var user = await _userRepository.GetByChatIdAsync(message.Chat.Id);
+
+                if (user == null)
+                {
+                    user = new Model.Entities.User
+                    {
+                        TelegramChatId = message.Chat.Id,
+                        UserName = message.Chat.Username,
+                        Status = true,
+                    };
+                    await _userRepository.AddAsync(user);
+                }
+
+                if (user.Status == false) throw new Exception("本帳號無法使用");
+
+                // 判斷使用者是否有訂閱個股推送功能
+                var subscription = await _subscriptionRepository.GetByItemAsync(subscriptionItem);
+
+                if (subscription == null) return 0;
+
+                var subscriptionUser = await _subscriptionUserRepository.GetByUserIdAndSubscriptionIdAsync(user.Id, subscription.Id);
+                if (subscriptionUser != null)
+                {
+                    return await _subscriptionUserRepository.DeleteAsync(subscriptionUser);
+                }
+
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "UnSubscriptionInfoAsync");
+                throw new Exception($"UnSubscriptionInfoAsync：{ex.Message}");
+            }
+        }
         private class StockData
         {
             public string stat { get; set; } = string.Empty;

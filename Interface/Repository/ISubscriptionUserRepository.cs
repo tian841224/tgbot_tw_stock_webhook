@@ -21,5 +21,8 @@ namespace TGBot_TW_Stock_Webhook.Interface.Repository
 
         /// <summary> 新增資料 </summary>
         Task<int> AddAsync(SubscriptionUser subscriptionUser);
+
+        /// <summary> 刪除資料 </summary>
+        Task<int> DeleteAsync(SubscriptionUser subscriptionUser);
     }
 }

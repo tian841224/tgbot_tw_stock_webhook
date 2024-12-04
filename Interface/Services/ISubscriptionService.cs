@@ -17,5 +17,8 @@ namespace TGBot_TW_Stock_Webhook.Interface.Services
 
         /// <summary> 訂閱功能 </summary>
         Task<int> SubscriptionInfoAsync(Message message, SubscriptionItemEnum subscriptionItem, CancellationToken cancellationToken);
+
+        /// <summary> 取消訂閱功能 </summary>
+        Task<int> UnSubscriptionInfoAsync(Message message, SubscriptionItemEnum subscriptionItem, CancellationToken cancellationToken);
     }
 }

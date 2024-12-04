@@ -94,5 +94,19 @@ namespace TGBot_TW_Stock_Webhook.Repository
                 throw;
             }
         }
+
+        public async Task<int> DeleteAsync(SubscriptionUser subscriptionUser)
+        {
+            try
+            {
+                _context.SubscriptionUsers.Remove(subscriptionUser);
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Add");
+                throw;
+            }
+        }
     }
 }

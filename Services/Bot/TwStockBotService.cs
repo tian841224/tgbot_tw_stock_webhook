@@ -373,6 +373,39 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
             }
         }
 
+        public async Task UnSubscriptionInfoAsync(Message message, SubscriptionItemEnum subscriptionItem, CancellationToken cancellationToken)
+        {
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var subscription = await _subscriptionService.UnSubscriptionInfoAsync(message, subscriptionItem, cancellationToken);
+
+                if (subscription == 0)
+                {
+                    await _botClient.SendTextMessageAsync(new SendTextDto
+                    {
+                        Message = message,
+                        Text = $"取消訂閱 {subscriptionItem.GetDescription()} 失敗",
+                        CancellationToken = cancellationToken,
+                    });
+
+                    return;
+                }
+
+                await _botClient.SendTextMessageAsync(new SendTextDto
+                {
+                    Message = message,
+                    Text = $"取消訂閱 {subscriptionItem.GetDescription()} 成功",
+                    CancellationToken = cancellationToken,
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, "SubscriptionInfo");
+                throw new Exception($"SubscriptionInfo：{ex.Message}");
+            }
+        }
+
         /// <summary>
         /// 取得API資料
         /// </summary>

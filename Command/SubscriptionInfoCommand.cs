@@ -6,7 +6,7 @@ namespace TGBot_TW_Stock_Webhook.Command
 {
     public class SubscriptionInfoCommand : ICommand
     {
-        public string Name => "/add";
+        public string Name => "/ntf";
         private readonly ITwStockBotService _twStockBotService;
         private readonly IBotService _botService;
 
