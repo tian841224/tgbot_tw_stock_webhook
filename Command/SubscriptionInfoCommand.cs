@@ -1,6 +1,5 @@
 ﻿using Telegram.Bot.Types;
 using TGBot_TW_Stock_Webhook.Enum;
-using TGBot_TW_Stock_Webhook.Extensions;
 using TGBot_TW_Stock_Webhook.Interface.Services;
 
 namespace TGBot_TW_Stock_Webhook.Command

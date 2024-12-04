@@ -40,7 +40,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             try
             {
                 // 取得訂閱此功能的會員清單
-                var subscriptionUserList = await GetSubscriptionUserSAsync(SubscriptionItemEnum.StockInfo, cancellationToken);
+                var subscriptionUserList = await GetSubscriptionUserAsync(SubscriptionItemEnum.StockInfo, cancellationToken);
                 if (subscriptionUserList == null || !subscriptionUserList.Any()) return;
 
                 // 取得今日收盤資料
@@ -78,7 +78,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                         stringBuilder.AppendLine(@$"</code>");
                     }
 
-                    var user = await _userRepository.GetByIdAsync(subscriptionUser.Id);
+                    var user = await _userRepository.GetByIdAsync(subscriptionUser.UserId);
                     if (user == null) return;
 
                     var message = new Message
@@ -108,7 +108,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             try
             {
                 // 取得訂閱此功能的會員清單
-                var subscriptionUserList = await GetSubscriptionUserSAsync(SubscriptionItemEnum.DailyMarketInfo, cancellationToken);
+                var subscriptionUserList = await GetSubscriptionUserAsync(SubscriptionItemEnum.DailyMarketInfo, cancellationToken);
                 if (subscriptionUserList == null || !subscriptionUserList.Any()) return;
 
                 foreach (var subscriptionUser in subscriptionUserList)
@@ -138,7 +138,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             try
             {
                 // 取得訂閱此功能的會員清單
-                var subscriptionUserList = await GetSubscriptionUserSAsync(SubscriptionItemEnum.DailyMarketInfo, cancellationToken);
+                var subscriptionUserList = await GetSubscriptionUserAsync(SubscriptionItemEnum.TopVolumeItems, cancellationToken);
                 if (subscriptionUserList == null || !subscriptionUserList.Any()) return;
 
                 foreach (var subscriptionUser in subscriptionUserList)
@@ -166,7 +166,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             try
             {
                 // 取得訂閱此功能的會員清單
-                var subscriptionUserList = await GetSubscriptionUserSAsync(SubscriptionItemEnum.DailyMarketInfo, cancellationToken);
+                var subscriptionUserList = await GetSubscriptionUserAsync(SubscriptionItemEnum.StockNews, cancellationToken);
                 if (subscriptionUserList == null || !subscriptionUserList.Any()) return;
 
                 foreach (var subscriptionUser in subscriptionUserList)
@@ -200,7 +200,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
         }
 
-        private async Task<List<SubscriptionUser>?> GetSubscriptionUserSAsync(SubscriptionItemEnum subscriptionItem, CancellationToken cancellationToken)
+        private async Task<List<SubscriptionUser>?> GetSubscriptionUserAsync(SubscriptionItemEnum subscriptionItem, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
