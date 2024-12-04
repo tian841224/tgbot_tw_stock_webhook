@@ -136,7 +136,8 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                     return;
 
                 var stringBuilder = new StringBuilder();
-
+                stringBuilder.AppendLine($"🔝<b>今日交易量前二十</b>");
+                stringBuilder.AppendLine();
                 foreach (var row in stockResponse.Data)
                 {
                     // 處理漲跌幅，加入表情符號
@@ -147,7 +148,6 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                     string emoji = upDownSign == "+" ? "📈" : upDownSign == "-" ? "📉" : "";
                     // 計算漲跌幅百分比
                     string percentageChange = openPrice != 0 ? $"{(changeAmount / openPrice * 100):F2}%" : "0.00%";
-
                     stringBuilder.AppendLine(@$"{emoji}<b>{row?[2]} ({row?[1]})</b><code>");
                     stringBuilder.AppendLine(@$"成交股數：{row?[3]}");
                     stringBuilder.AppendLine(@$"成交筆數：{row?[4]}");
