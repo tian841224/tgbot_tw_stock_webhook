@@ -13,11 +13,10 @@ using TGBot_TW_Stock_Webhook.Model.DTOs;
 
 namespace TGBot_TW_Stock_Webhook.Services.Bot
 {
-    public class TwStockBotService(ILogger<TwStockBotService> logger, IHttpClientFactory httpClientFactory, IBotService botClien,
+    public class TwStockBotService(ILogger<TwStockBotService> logger, IHttpClientFactory _httpClientFactory, IBotService botClien,
         ISubscriptionService subscriptionService) : ITwStockBotService
     {
         private readonly ILogger<TwStockBotService> _logger = logger;
-        private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
         private readonly IBotService _botClient = botClien;
         private readonly ISubscriptionService _subscriptionService = subscriptionService;
 
@@ -232,7 +231,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                 }
 
                 // 查詢股票名稱
-                using var client = httpClientFactory.CreateClient();
+                using var client = _httpClientFactory.CreateClient();
                 string url = $"https://www.twse.com.tw/rwd/zh/api/codeQuery?query={stock}";
                 HttpResponseMessage response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
@@ -314,7 +313,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                 foreach (var subscription in subscriptionList)
                 {
                     // 查詢股票名稱
-                    using var client = httpClientFactory.CreateClient();
+                    using var client = _httpClientFactory.CreateClient();
                     string url = $"https://www.twse.com.tw/rwd/zh/api/codeQuery?query={subscription.Symbol}";
                     HttpResponseMessage response = await client.GetAsync(url);
                     response.EnsureSuccessStatusCode();
