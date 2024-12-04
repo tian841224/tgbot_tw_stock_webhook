@@ -8,10 +8,13 @@ namespace TGBot_TW_Stock_Webhook.Interface.Repository
         Task<SubscriptionUser?> GetByIdAsync(int id);
 
         /// <summary> 使用UserId取得資料 </summary>
-        Task<SubscriptionUser?> GetByUserIdAsync(int userId);
+        Task<List<SubscriptionUser>?> GetByUserIdAsync(int userId);
 
         /// <summary> 使用SubscriptionId取得資料 </summary>
         Task<List<SubscriptionUser>?> GetBySubscriptionIdAsync(int subscriptionId);
+
+        /// <summary> 使用UserId和SubscriptionId取得資料 </summary>
+        Task<SubscriptionUser?> GetByUserIdAndSubscriptionIdAsync(int userId, int subscriptionId);
 
         /// <summary> 取得全部資料 </summary>
         Task<List<SubscriptionUser>> GetAllAsync();

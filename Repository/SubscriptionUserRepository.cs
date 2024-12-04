@@ -30,11 +30,11 @@ namespace TGBot_TW_Stock_Webhook.Repository
             }
         }
 
-        public async Task<SubscriptionUser?> GetByUserIdAsync(int userId)
+        public async Task<List<SubscriptionUser>?> GetByUserIdAsync(int userId)
         {
             try
             {
-                return await _context.SubscriptionUsers.FirstOrDefaultAsync(x => x.UserId == userId);
+                return await _context.SubscriptionUsers.Where(x => x.UserId == userId).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -47,6 +47,19 @@ namespace TGBot_TW_Stock_Webhook.Repository
             try
             {
                 return await _context.SubscriptionUsers.Where(x => x.SubscriptionId == subscriptionId).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetBySubscriptionId");
+                throw;
+            }
+        }
+
+        public async Task<SubscriptionUser?> GetByUserIdAndSubscriptionIdAsync(int userId,int subscriptionId)
+        {
+            try
+            {
+                return await _context.SubscriptionUsers.FirstOrDefaultAsync(x => x.SubscriptionId == subscriptionId && x.UserId == userId);
             }
             catch (Exception ex)
             {
