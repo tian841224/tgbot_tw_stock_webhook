@@ -1,71 +1,89 @@
 using System.Text;
 using Telegram.Bot.Types;
+using TGBot_TW_Stock_Webhook.Enum;
+using TGBot_TW_Stock_Webhook.Interface;
 using TGBot_TW_Stock_Webhook.Interface.Repository;
 using TGBot_TW_Stock_Webhook.Interface.Services;
 using TGBot_TW_Stock_Webhook.Model.DTOs;
+using TGBot_TW_Stock_Webhook.Model.Entities;
 
 namespace TGBot_TW_Stock_Webhook.Services
 {
-    public class NotificationService 
+    public class NotificationService : INotificationService
     {
         private readonly ILogger<NotificationService> _logger;
-        private readonly IUserRepository _userService;
+        private readonly ISubscriptionUserStockRepository _subscriptionUserStockRepository;
+        private readonly ISubscriptionUserRepository _subscriptionUserRepository;
         private readonly ISubscriptionRepository _subscriptionRepository;
+        private readonly IUserRepository _userRepository;
         private readonly ITwStockService _twStock;
+        private readonly ITwStockBotService _twStockBotService;
         private readonly IBotService _botService;
-        public NotificationService(ITwStockService twStock, IUserRepository userService, ILogger<NotificationService> logger, ISubscriptionRepository subscriptionRepository,
-            IBotService botService)
+        public NotificationService(ITwStockService twStock, ISubscriptionUserRepository subscriptionUserRepository, ILogger<NotificationService> logger, ISubscriptionRepository subscriptionRepository,
+            IBotService botService, ISubscriptionUserStockRepository subscriptionUserStockRepository, IUserRepository userRepository,
+            ITwStockBotService twStockBotService)
         {
             _twStock = twStock;
-            _userService = userService;
+            _subscriptionUserRepository = subscriptionUserRepository;
             _logger = logger;
             _subscriptionRepository = subscriptionRepository;
             _botService = botService;
+            _subscriptionUserStockRepository = subscriptionUserStockRepository;
+            _userRepository = userRepository;
+            _twStockBotService = twStockBotService;
         }
 
-        public async Task SendStockInfoAsync()
+        public async Task SendStockInfoAsync(CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             try
             {
-                var userList = await _userService.GetAllAsync();
+                // 取得訂閱此功能的會員清單
+                var subscriptionUserList = await GetSubscriptionUserSAsync(SubscriptionItemEnum.StockInfo, cancellationToken);
+                if (subscriptionUserList == null || !subscriptionUserList.Any()) return;
+
+                // 取得今日收盤資料
                 var stockInfoList = await _twStock.GetAfterTradingVolumeAsync(null);
+                if (stockInfoList == null || !stockInfoList.Any()) return;
 
-                foreach (var user in userList)
+                foreach (var subscriptionUser in subscriptionUserList)
                 {
-                    // 取得使用者訂閱清單
-                    //var subList = await _subscriptionRepository.GetByUserId(user.Id);
-                    //if (subList == null || subList.Count == 0) continue;
-
-                    // 取得股票代號
-                    //var symbolList = subList.Select(x => x.Symbol).ToList();
-                    // 取得股票資訊
-                    //var resultList = stockInfoList.Where(x => !string.IsNullOrEmpty(x.Symbol) && symbolList.Contains(x.Symbol)).ToList();
+                    //取得使用者訂閱清單
+                    var subscriptionUserStockList = await _subscriptionUserStockRepository.GetByUserIdAsync(subscriptionUser.UserId);
+                    if (subscriptionUserStockList == null || !subscriptionUserStockList.Any()) return;
 
                     var stringBuilder = new StringBuilder();
 
-                    //foreach (var stock in resultList)
-                    //{
-                    //    if (stock == null) continue;
-                    //    // 處理漲跌幅，加入表情符號
-                    //    string emoji = stock.UpDownSign == "+" ? "📈" : stock.UpDownSign == "-" ? "📉" : "";
-                    //    // 計算漲跌幅百分比
-                    //    string percentageChange = stock.OpenPrice != 0 ? $"{stock.PriceChangeValue / stock.OpenPrice * 100:F2}%" : "0.00%";
+                    foreach (var subscriptionUserStock in subscriptionUserStockList)
+                    {
+                        //取得股票資訊
+                        var stock = stockInfoList.FirstOrDefault(x => !string.IsNullOrEmpty(x.Symbol) && subscriptionUserStock.Symbol == x.Symbol);
+                        if (stock == null) return;
 
-                    //    stringBuilder.AppendLine(@$"<b>{stock.Name} ({stock.Symbol})</b>{emoji}<code>");
-                    //    stringBuilder.AppendLine(@$"成交股數：{stock.TradingVolume}");
-                    //    stringBuilder.AppendLine(@$"成交筆數：{stock.TransactionCount}");
-                    //    stringBuilder.AppendLine(@$"成交金額：{stock.TradingValue}");
-                    //    stringBuilder.AppendLine(@$"開盤價：{stock.OpenPrice}");
-                    //    stringBuilder.AppendLine(@$"收盤價：{stock.ClosePrice}");
-                    //    stringBuilder.AppendLine(@$"漲跌幅：{stock.UpDownSign}{stock.PriceChangeValue} ({percentageChange})");
-                    //    stringBuilder.AppendLine(@$"最高價：{stock.HighPrice}");
-                    //    stringBuilder.AppendLine(@$"最低價：{stock.LowPrice}");
-                    //    stringBuilder.AppendLine(@$"</code>");
-                    //};
+                        // 處理漲跌幅，加入表情符號
+                        string emoji = stock.UpDownSign == "+" ? "📈" : stock.UpDownSign == "-" ? "📉" : "";
+                        // 計算漲跌幅百分比
+                        string percentageChange = stock.OpenPrice != 0 ? $"{stock.PriceChangeValue / stock.OpenPrice * 100:F2}%" : "0.00%";
+
+                        stringBuilder.AppendLine(@$"<b>{stock.Name} ({stock.Symbol})</b>{emoji}<code>");
+                        stringBuilder.AppendLine(@$"成交股數：{stock.TradingVolume}");
+                        stringBuilder.AppendLine(@$"成交筆數：{stock.TransactionCount}");
+                        stringBuilder.AppendLine(@$"成交金額：{stock.TradingValue}");
+                        stringBuilder.AppendLine(@$"開盤價：{stock.OpenPrice}");
+                        stringBuilder.AppendLine(@$"收盤價：{stock.ClosePrice}");
+                        stringBuilder.AppendLine(@$"漲跌幅：{stock.UpDownSign}{stock.PriceChangeValue} ({percentageChange})");
+                        stringBuilder.AppendLine(@$"最高價：{stock.HighPrice}");
+                        stringBuilder.AppendLine(@$"最低價：{stock.LowPrice}");
+                        stringBuilder.AppendLine(@$"</code>");
+                    }
+
+                    var user = await _userRepository.GetByIdAsync(subscriptionUser.Id);
+                    if (user == null) return;
 
                     var message = new Message
                     {
-                        Chat = new Chat { Id = user.Id }
+                        Chat = new Chat { Id = user.TelegramChatId }
                     };
 
                     await _botService.SendTextMessageAsync(new SendTextDto
@@ -83,12 +101,29 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
         }
 
-        public async Task SendDailyMarketInfoAsync()
+        public async Task SendDailyMarketInfoAsync(CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             try
             {
-                var userList = await _userService.GetAllAsync();
-                var stockInfoList = await _twStock.GetDailyMarketInfoAsync();
+                // 取得訂閱此功能的會員清單
+                var subscriptionUserList = await GetSubscriptionUserSAsync(SubscriptionItemEnum.DailyMarketInfo, cancellationToken);
+                if (subscriptionUserList == null || !subscriptionUserList.Any()) return;
+
+                foreach (var subscriptionUser in subscriptionUserList)
+                {
+                    var user = await _userRepository.GetByIdAsync(subscriptionUser.UserId);
+                    if (user == null) return;
+
+                    var message = new Message
+                    {
+                        Chat = new Chat { Id = user.TelegramChatId }
+                    };
+
+                    await _twStockBotService.GetDailyMarketInfoAsync(message, cancellationToken, 1);
+                }
+
             }
             catch (Exception ex)
             {
@@ -97,10 +132,27 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
         }
 
-        public async Task SendTopVolumeItemsAsync()
+        public async Task SendTopVolumeItemsAsync(CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             try
             {
+                // 取得訂閱此功能的會員清單
+                var subscriptionUserList = await GetSubscriptionUserSAsync(SubscriptionItemEnum.DailyMarketInfo, cancellationToken);
+                if (subscriptionUserList == null || !subscriptionUserList.Any()) return;
+
+                foreach (var subscriptionUser in subscriptionUserList)
+                {
+                    var user = await _userRepository.GetByIdAsync(subscriptionUser.UserId);
+                    if (user == null) return;
+
+                    var message = new Message
+                    {
+                        Chat = new Chat { Id = user.TelegramChatId }
+                    };
+
+                    await _twStockBotService.GetTopVolumeItemsAsync(message, cancellationToken);
+                }
             }
             catch (Exception ex)
             {
@@ -109,10 +161,36 @@ namespace TGBot_TW_Stock_Webhook.Services
             }
         }
 
-        public async Task SendStockNewsAsync()
+        public async Task SendStockNewsAsync(CancellationToken cancellationToken)
         {
             try
             {
+                // 取得訂閱此功能的會員清單
+                var subscriptionUserList = await GetSubscriptionUserSAsync(SubscriptionItemEnum.DailyMarketInfo, cancellationToken);
+                if (subscriptionUserList == null || !subscriptionUserList.Any()) return;
+
+                foreach (var subscriptionUser in subscriptionUserList)
+                {
+                    //取得使用者訂閱清單
+                    var subscriptionUserStockList = await _subscriptionUserStockRepository.GetByUserIdAsync(subscriptionUser.UserId);
+                    if (subscriptionUserStockList == null || !subscriptionUserStockList.Any()) return;
+
+                    var stringBuilder = new StringBuilder();
+
+                    foreach (var subscriptionUserStock in subscriptionUserStockList)
+                    {
+
+                        var user = await _userRepository.GetByIdAsync(subscriptionUser.UserId);
+                        if (user == null) return;
+
+                        var message = new Message
+                        {
+                            Chat = new Chat { Id = user.TelegramChatId }
+                        };
+
+                        await _twStockBotService.GetStockNewsAsync(message, cancellationToken, subscriptionUserStock.Symbol);
+                    }
+                }
 
             }
             catch (Exception ex)
@@ -120,6 +198,17 @@ namespace TGBot_TW_Stock_Webhook.Services
                 _logger.LogError(ex.Message, "SendStockNews");
                 throw new Exception($"SendStockNewsAsync : {ex.Message}");
             }
+        }
+
+        private async Task<List<SubscriptionUser>?> GetSubscriptionUserSAsync(SubscriptionItemEnum subscriptionItem, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var subscription = await _subscriptionRepository.GetByItemAsync(subscriptionItem);
+            if (subscription == null) return null;
+
+            // 取得訂閱此功能的會員清單
+            return await _subscriptionUserRepository.GetBySubscriptionIdAsync(subscription.Id);
         }
     }
 }

@@ -2,6 +2,7 @@ using Telegram.Bot;
 using TGBot_TW_Stock_Webhook.Command;
 using TGBot_TW_Stock_Webhook.Data;
 using TGBot_TW_Stock_Webhook.Extensions;
+using TGBot_TW_Stock_Webhook.Interface;
 using TGBot_TW_Stock_Webhook.Interface.Repository;
 using TGBot_TW_Stock_Webhook.Interface.Services;
 using TGBot_TW_Stock_Webhook.Model;
@@ -35,6 +36,7 @@ builder.Services.AddSingleton<IBotService, BotService>();
 
 // 業務邏輯服務使用 Scoped
 builder.Services.AddScoped<UpdateHandler>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 // 指令功能
 builder.Services.AddScoped<ICommandFactory, CommandFactory>();
