@@ -9,30 +9,10 @@ using TGBot_TW_Stock_Webhook.Model.Entities;
 
 namespace TGBot_TW_Stock_Webhook.Services
 {
-    public class NotificationService : INotificationService
+    public class NotificationService(ILogger<NotificationService> _logger, ISubscriptionUserStockRepository _subscriptionUserStockRepository, ISubscriptionUserRepository _subscriptionUserRepository,
+       ISubscriptionRepository _subscriptionRepository, IUserRepository _userRepository, ITwStockService _twStock, ITwStockBotService _twStockBotService,
+       IBotService _botService) : INotificationService
     {
-        private readonly ILogger<NotificationService> _logger;
-        private readonly ISubscriptionUserStockRepository _subscriptionUserStockRepository;
-        private readonly ISubscriptionUserRepository _subscriptionUserRepository;
-        private readonly ISubscriptionRepository _subscriptionRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly ITwStockService _twStock;
-        private readonly ITwStockBotService _twStockBotService;
-        private readonly IBotService _botService;
-        public NotificationService(ITwStockService twStock, ISubscriptionUserRepository subscriptionUserRepository, ILogger<NotificationService> logger, ISubscriptionRepository subscriptionRepository,
-            IBotService botService, ISubscriptionUserStockRepository subscriptionUserStockRepository, IUserRepository userRepository,
-            ITwStockBotService twStockBotService)
-        {
-            _twStock = twStock;
-            _subscriptionUserRepository = subscriptionUserRepository;
-            _logger = logger;
-            _subscriptionRepository = subscriptionRepository;
-            _botService = botService;
-            _subscriptionUserStockRepository = subscriptionUserStockRepository;
-            _userRepository = userRepository;
-            _twStockBotService = twStockBotService;
-        }
-
         public async Task SendStockInfoAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -47,9 +27,10 @@ namespace TGBot_TW_Stock_Webhook.Services
                 var stockInfoList = await _twStock.GetAfterTradingVolumeAsync(null);
                 if (stockInfoList == null || !stockInfoList.Any()) return;
 
-                foreach (var subscriptionUser in subscriptionUserList)
+                // 使用 Task.WhenAll 和 Task.Run 來並行處理
+                var tasks = subscriptionUserList.Select(async (subscriptionUser) =>
                 {
-                    //取得使用者訂閱清單
+                    // 取得使用者訂閱清單
                     var subscriptionUserStockList = await _subscriptionUserStockRepository.GetByUserIdAsync(subscriptionUser.UserId);
                     if (subscriptionUserStockList == null || !subscriptionUserStockList.Any()) return;
 
@@ -57,9 +38,9 @@ namespace TGBot_TW_Stock_Webhook.Services
 
                     foreach (var subscriptionUserStock in subscriptionUserStockList)
                     {
-                        //取得股票資訊
+                        // 取得股票資訊
                         var stock = stockInfoList.FirstOrDefault(x => !string.IsNullOrEmpty(x.Symbol) && subscriptionUserStock.Symbol == x.Symbol);
-                        if (stock == null) return;
+                        if (stock == null) continue;
 
                         // 處理漲跌幅，加入表情符號
                         string emoji = stock.UpDownSign == "+" ? "📈" : stock.UpDownSign == "-" ? "📉" : "";
@@ -90,13 +71,15 @@ namespace TGBot_TW_Stock_Webhook.Services
                     {
                         Message = message,
                         Text = stringBuilder.ToString(),
-                        CancellationToken = new CancellationToken()
+                        CancellationToken = cancellationToken
                     });
-                }
+                }).ToList();
+
+                await Task.WhenAll(tasks);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message, "SendStockInfo");
+                _logger.LogError(ex, "SendStockInfo");
                 throw new Exception($"SendStockInfoAsync : {ex.Message}");
             }
         }
@@ -110,8 +93,8 @@ namespace TGBot_TW_Stock_Webhook.Services
                 // 取得訂閱此功能的會員清單
                 var subscriptionUserList = await GetSubscriptionUserAsync(SubscriptionItemEnum.DailyMarketInfo, cancellationToken);
                 if (subscriptionUserList == null || !subscriptionUserList.Any()) return;
-
-                foreach (var subscriptionUser in subscriptionUserList)
+                
+                var tasks = subscriptionUserList.Select(async (subscriptionUser) =>
                 {
                     var user = await _userRepository.GetByIdAsync(subscriptionUser.UserId);
                     if (user == null) return;
@@ -122,8 +105,9 @@ namespace TGBot_TW_Stock_Webhook.Services
                     };
 
                     await _twStockBotService.GetDailyMarketInfoAsync(message, cancellationToken, 1);
-                }
+                }).ToList();
 
+                await Task.WhenAll(tasks);
             }
             catch (Exception ex)
             {
@@ -141,7 +125,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                 var subscriptionUserList = await GetSubscriptionUserAsync(SubscriptionItemEnum.TopVolumeItems, cancellationToken);
                 if (subscriptionUserList == null || !subscriptionUserList.Any()) return;
 
-                foreach (var subscriptionUser in subscriptionUserList)
+                var tasks = subscriptionUserList.Select(async (subscriptionUser) =>
                 {
                     var user = await _userRepository.GetByIdAsync(subscriptionUser.UserId);
                     if (user == null) return;
@@ -152,7 +136,9 @@ namespace TGBot_TW_Stock_Webhook.Services
                     };
 
                     await _twStockBotService.GetTopVolumeItemsAsync(message, cancellationToken);
-                }
+                }).ToList();
+
+                await Task.WhenAll(tasks);
             }
             catch (Exception ex)
             {
@@ -169,7 +155,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                 var subscriptionUserList = await GetSubscriptionUserAsync(SubscriptionItemEnum.StockNews, cancellationToken);
                 if (subscriptionUserList == null || !subscriptionUserList.Any()) return;
 
-                foreach (var subscriptionUser in subscriptionUserList)
+                var tasks = subscriptionUserList.Select(async (subscriptionUser) =>
                 {
                     //取得使用者訂閱清單
                     var subscriptionUserStockList = await _subscriptionUserStockRepository.GetByUserIdAsync(subscriptionUser.UserId);
@@ -190,8 +176,9 @@ namespace TGBot_TW_Stock_Webhook.Services
 
                         await _twStockBotService.GetStockNewsAsync(message, cancellationToken, subscriptionUserStock.Symbol);
                     }
-                }
+                }).ToList();
 
+                await Task.WhenAll(tasks);
             }
             catch (Exception ex)
             {

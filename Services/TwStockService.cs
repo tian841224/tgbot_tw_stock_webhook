@@ -5,18 +5,8 @@ using TGBot_TW_Stock_Webhook.Model.DTOs;
 
 namespace TGBot_TW_Stock_Webhook.Services
 {
-    public class TwStockService : ITwStockService
+    public class TwStockService(ILogger<TwStockService> _logger, IHttpClientFactory _httpClientFactory) : ITwStockService
     {
-        private readonly ILogger<TwStockService> _logger;
-        private readonly IHttpClientFactory _httpClientFactory;
-
-
-        public TwStockService(ILogger<TwStockService> logger, IHttpClientFactory httpClientFactory)
-        {
-            _logger = logger;
-            _httpClientFactory = httpClientFactory;
-        }
-
         // TODO: 漲跌最多前50清單
 
         /// <summary>

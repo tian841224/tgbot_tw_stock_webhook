@@ -6,21 +6,10 @@ using TGBot_TW_Stock_Webhook.Interface.Services;
 
 namespace TGBot_TW_Stock_Webhook.Services
 {
-    public class CommonService : ICommonService
+    public class CommonService(ILogger<CommonService> _logger, IBrowserHandlers _browserHandlers, ITelegramBotClient _botClient) : ICommonService
     {
-        private readonly ILogger<CommonService> _logger;
-        private readonly IBrowserHandlers _browserHandlers;
-        private readonly ITelegramBotClient _botClient;
         private readonly TimeSpan delay = TimeSpan.FromSeconds(3); // 每次重試的延遲時間
         private readonly int maxRetries = 3; // 最大重試次數
-
-        public CommonService(ILogger<CommonService> logger, IBrowserHandlers browserHandlers, ITelegramBotClient botClient)
-        {
-            _logger = logger;
-            _browserHandlers = browserHandlers;
-            _botClient = botClient;
-        }
-
 
         ///  <summary> 方法重試 </summary>
         public async Task RetryAsync(Func<Task> action, Message message, CancellationToken cancellationToken)

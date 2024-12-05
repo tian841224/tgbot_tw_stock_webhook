@@ -3,13 +3,11 @@ using TGBot_TW_Stock_Webhook.Interface.Services;
 
 namespace TGBot_TW_Stock_Webhook.Services
 {
-    public class BrowserService(ILogger<BrowserService> logger) : IBrowserHandlers
+    public class BrowserService(ILogger<BrowserService> _logger) : IBrowserHandlers
     {
-        private readonly ILogger<BrowserService> _logger = logger;
         private IBrowser? _browser = null;
         private IPage? _page = null;
         private readonly TimeSpan _timeout = TimeSpan.FromMinutes(1);
-
 
         /// <summary>
         /// 載入網頁

@@ -7,15 +7,8 @@ using TGBot_TW_Stock_Webhook.Model.DTOs;
 
 namespace TGBot_TW_Stock_Webhook.Services
 {
-    public class BotService : IBotService
+    public class BotService(ITelegramBotClient _botClient) : IBotService
     {
-        private readonly ITelegramBotClient _botClient;
-
-        public BotService(ITelegramBotClient botClient)
-        {
-            _botClient = botClient;
-        }
-
         public async Task<Message> SendTextMessageAsync(SendTextDto dto)
         {
             dto.CancellationToken.ThrowIfCancellationRequested();

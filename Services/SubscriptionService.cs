@@ -11,16 +11,10 @@ namespace TGBot_TW_Stock_Webhook.Services
     /// <summary>
     /// 訂閱功能
     /// </summary>
-    public class SubscriptionService(ILogger<SubscriptionService> logger, IUserRepository userRepository,
-        ISubscriptionUserRepository subscriptionUserRepository, ISubscriptionRepository subscriptionRepository,
-        ISubscriptionUserStockRepository subscriptionUserStockRepository) : ISubscriptionService
+    public class SubscriptionService(ILogger<SubscriptionService> _logger, IUserRepository _userRepository,
+        ISubscriptionUserRepository _subscriptionUserRepository, ISubscriptionRepository _subscriptionRepository,
+        ISubscriptionUserStockRepository _subscriptionUserStockRepository) : ISubscriptionService
     {
-        private readonly ILogger<SubscriptionService> _logger = logger;
-        private readonly IUserRepository _userRepository = userRepository;
-        private readonly ISubscriptionRepository _subscriptionRepository = subscriptionRepository;
-        private readonly ISubscriptionUserRepository _subscriptionUserRepository = subscriptionUserRepository;
-        private readonly ISubscriptionUserStockRepository _subscriptionUserStockRepository = subscriptionUserStockRepository;
-
         public async Task<int> SubscriptionStockAsync(Message message, string stock, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();

@@ -2,7 +2,7 @@
 
 namespace TGBot_TW_Stock_Webhook.Model
 {
-    public class DataBase
+    public sealed class DataBase
     {
         public DbTypeEnum Type { get; set; }
         public required string ConnectionStrings { get; set; }

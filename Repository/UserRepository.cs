@@ -5,22 +5,13 @@ using TGBot_TW_Stock_Webhook.Model.Entities;
 
 namespace TGBot_TW_Stock_Webhook.Services
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository(ILogger<UserRepository> _logger, AppDbContext _context) : IUserRepository
     {
-        private readonly ILogger<UserRepository> _logger;
-
-        private readonly AppDbContext _context;
-        public UserRepository(ILogger<UserRepository> logger, AppDbContext context)
-        {
-            _logger = logger;
-            _context = context;
-        }
-
         public async Task<User?> GetByIdAsync(int id)
         {
             try
             {
-                return await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+                return await _context.Users.FindAsync(id);
             }
             catch (Exception ex)
             {
@@ -33,7 +24,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         {
             try
             {
-                return await _context.Users.FirstOrDefaultAsync(x => x.TelegramChatId == chatId);
+                return await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.TelegramChatId == chatId);
             }
             catch (Exception ex)
             {
@@ -46,7 +37,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         {
             try
             {
-                return await _context.Users.ToListAsync();
+                return await _context.Users.AsNoTracking().ToListAsync();
             }
             catch (Exception ex)
             {
