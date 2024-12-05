@@ -5,12 +5,13 @@ using TGBot_TW_Stock_Webhook.Model.Entities;
 
 namespace TGBot_TW_Stock_Webhook.Repository
 {
-    public class SubscriptionUserStockRepository(ILogger<SubscriptionUserStockRepository> _logger, AppDbContext _context) : ISubscriptionUserStockRepository
+    public class SubscriptionUserStockRepository(ILogger<SubscriptionUserStockRepository> _logger, IDbContextFactory<AppDbContext> _contextFactory) : ISubscriptionUserStockRepository
     {
         public async Task<SubscriptionUserStock?> GetByIdAsync(int id)
         {
             try
             {
+                using var _context = await _contextFactory.CreateDbContextAsync();
                 return await _context.SubscriptionUserStocks.FindAsync(id);
             }
             catch (Exception ex)
@@ -24,6 +25,7 @@ namespace TGBot_TW_Stock_Webhook.Repository
         {
             try
             {
+                using var _context = await _contextFactory.CreateDbContextAsync();
                 return await _context.SubscriptionUserStocks.AsNoTracking().Where(x => x.UserId == userId).ToListAsync();
             }
             catch (Exception ex)
@@ -37,6 +39,7 @@ namespace TGBot_TW_Stock_Webhook.Repository
         {
             try
             {
+                using var _context = await _contextFactory.CreateDbContextAsync();
                 return await _context.SubscriptionUserStocks.AsNoTracking().Where(x => x.Symbol == symbol).ToListAsync();
             }
             catch (Exception ex)
@@ -50,6 +53,7 @@ namespace TGBot_TW_Stock_Webhook.Repository
         {
             try
             {
+                using var _context = await _contextFactory.CreateDbContextAsync();
                 return await _context.SubscriptionUserStocks.AsNoTracking().FirstOrDefaultAsync(x => x.UserId == userId && x.Symbol == symbol);
             }
             catch (Exception ex)
@@ -64,6 +68,7 @@ namespace TGBot_TW_Stock_Webhook.Repository
         {
             try
             {
+                using var _context = await _contextFactory.CreateDbContextAsync();
                 return await _context.SubscriptionUserStocks.AsNoTracking().ToListAsync();
             }
             catch (Exception ex)
@@ -77,6 +82,7 @@ namespace TGBot_TW_Stock_Webhook.Repository
         {
             try
             {
+                using var _context = await _contextFactory.CreateDbContextAsync();
                 await _context.SubscriptionUserStocks.AddAsync(subscriptionUserStock);
                 return await _context.SaveChangesAsync();
             }
@@ -91,6 +97,7 @@ namespace TGBot_TW_Stock_Webhook.Repository
         {
             try
             {
+                using var _context = await _contextFactory.CreateDbContextAsync();
                 _context.SubscriptionUserStocks.Remove(subscriptionUserStock);
                 return await _context.SaveChangesAsync();
             }

@@ -71,7 +71,7 @@ builder.Services.AddScoped<ISubscriptionUserStockRepository, SubscriptionUserSto
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // DB
-builder.Services.AddDbContext<AppDbContext>();
+builder.Services.AddDbContextFactory<AppDbContext>();
 
 builder.Services.ConfigureTelegramBotMvc();
 builder.Services.AddControllers();

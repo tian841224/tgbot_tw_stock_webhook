@@ -28,7 +28,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                 if (stockInfoList == null || !stockInfoList.Any()) return;
 
                 // 使用 Task.WhenAll 和 Task.Run 來並行處理
-                var tasks = subscriptionUserList.Select(async (subscriptionUser) =>
+                await Parallel.ForEachAsync(subscriptionUserList, cancellationToken, async (subscriptionUser, ct) =>
                 {
                     // 取得使用者訂閱清單
                     var subscriptionUserStockList = await _subscriptionUserStockRepository.GetByUserIdAsync(subscriptionUser.UserId);
@@ -73,9 +73,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                         Text = stringBuilder.ToString(),
                         CancellationToken = cancellationToken
                     });
-                }).ToList();
-
-                await Task.WhenAll(tasks);
+                });
             }
             catch (Exception ex)
             {
@@ -93,21 +91,16 @@ namespace TGBot_TW_Stock_Webhook.Services
                 // 取得訂閱此功能的會員清單
                 var subscriptionUserList = await GetSubscriptionUserAsync(SubscriptionItemEnum.DailyMarketInfo, cancellationToken);
                 if (subscriptionUserList == null || !subscriptionUserList.Any()) return;
-                
-                var tasks = subscriptionUserList.Select(async (subscriptionUser) =>
-                {
-                    var user = await _userRepository.GetByIdAsync(subscriptionUser.UserId);
-                    if (user == null) return;
 
-                    var message = new Message
+                await Parallel.ForEachAsync(subscriptionUserList, cancellationToken, async (subscriptionUser, ct) =>
                     {
-                        Chat = new Chat { Id = user.TelegramChatId }
-                    };
+                        var user = await _userRepository.GetByIdAsync(subscriptionUser.UserId);
+                        if (user == null) return;
 
-                    await _twStockBotService.GetDailyMarketInfoAsync(message, cancellationToken, 1);
-                }).ToList();
+                        var message = new Message { Chat = new Chat { Id = user.TelegramChatId } };
 
-                await Task.WhenAll(tasks);
+                        await _twStockBotService.GetDailyMarketInfoAsync(message, ct, 1);
+                    });
             }
             catch (Exception ex)
             {
@@ -125,7 +118,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                 var subscriptionUserList = await GetSubscriptionUserAsync(SubscriptionItemEnum.TopVolumeItems, cancellationToken);
                 if (subscriptionUserList == null || !subscriptionUserList.Any()) return;
 
-                var tasks = subscriptionUserList.Select(async (subscriptionUser) =>
+                await Parallel.ForEachAsync(subscriptionUserList, cancellationToken, async (subscriptionUser, ct) =>
                 {
                     var user = await _userRepository.GetByIdAsync(subscriptionUser.UserId);
                     if (user == null) return;
@@ -136,9 +129,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                     };
 
                     await _twStockBotService.GetTopVolumeItemsAsync(message, cancellationToken);
-                }).ToList();
-
-                await Task.WhenAll(tasks);
+                });
             }
             catch (Exception ex)
             {
@@ -155,7 +146,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                 var subscriptionUserList = await GetSubscriptionUserAsync(SubscriptionItemEnum.StockNews, cancellationToken);
                 if (subscriptionUserList == null || !subscriptionUserList.Any()) return;
 
-                var tasks = subscriptionUserList.Select(async (subscriptionUser) =>
+                await Parallel.ForEachAsync(subscriptionUserList, cancellationToken, async (subscriptionUser, ct) =>
                 {
                     //取得使用者訂閱清單
                     var subscriptionUserStockList = await _subscriptionUserStockRepository.GetByUserIdAsync(subscriptionUser.UserId);
@@ -176,9 +167,7 @@ namespace TGBot_TW_Stock_Webhook.Services
 
                         await _twStockBotService.GetStockNewsAsync(message, cancellationToken, subscriptionUserStock.Symbol);
                     }
-                }).ToList();
-
-                await Task.WhenAll(tasks);
+                });
             }
             catch (Exception ex)
             {

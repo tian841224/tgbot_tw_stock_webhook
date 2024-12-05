@@ -6,12 +6,13 @@ using TGBot_TW_Stock_Webhook.Model.Entities;
 
 namespace TGBot_TW_Stock_Webhook.Services
 {
-    public class SubscriptionRepository(ILogger<SubscriptionRepository> _logger, AppDbContext _context) : ISubscriptionRepository
+    public class SubscriptionRepository(ILogger<SubscriptionRepository> _logger, IDbContextFactory<AppDbContext> _contextFactory) : ISubscriptionRepository
     {
         public async Task<Subscription?> GetByIdAsync(int id)
         {
             try
             {
+                using var _context = await _contextFactory.CreateDbContextAsync();
                 return await _context.Subscriptions.FindAsync(id);
             }
             catch (Exception ex)
@@ -25,6 +26,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         {
             try
             {
+                using var _context = await _contextFactory.CreateDbContextAsync();
                 return await _context.Subscriptions.AsNoTracking().FirstOrDefaultAsync(x => x.Item == item);
             }
             catch (Exception ex)
@@ -38,6 +40,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         {
             try
             {
+                using var _context = await _contextFactory.CreateDbContextAsync();
                 return await _context.Subscriptions.AsNoTracking().Where(x => x.Status == true).ToListAsync();
             }
             catch (Exception ex)
@@ -51,6 +54,7 @@ namespace TGBot_TW_Stock_Webhook.Services
         {
             try
             {
+                using var _context = await _contextFactory.CreateDbContextAsync();
                 await _context.Subscriptions.AddAsync(subscription);
                 return await _context.SaveChangesAsync();
             }
