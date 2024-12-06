@@ -13,15 +13,20 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
         private readonly ILogger<Cnyes> _logger;
         private readonly IBrowserHandlers _browserHandlers;
         private readonly ICommonService _commonService;
+        private readonly IConfiguration _configuration;
         private string stockUrl = "https://www.cnyes.com/twstock/";
         private WaitForSelectorOptions waitForSelectorOptions = new WaitForSelectorOptions { Visible = true };
+        private WaitForNetworkIdleOptions _waitForNetworkIdleOptions;
 
-        public Cnyes(IBotService botClient, ILogger<Cnyes> logger, IBrowserHandlers browserHandlers, ICommonService commonService)
+        public Cnyes(IBotService botClient, ILogger<Cnyes> logger, IBrowserHandlers browserHandlers, ICommonService commonService, IConfiguration configuration)
         {
             _botClient = botClient;
             _logger = logger;
             _browserHandlers = browserHandlers;
             _commonService = commonService;
+            _configuration = configuration;
+            var timeout = _configuration.GetValue<int>("WaitForNetworkIdleOptions:Timeout", 3);
+            _waitForNetworkIdleOptions = new WaitForNetworkIdleOptions { Timeout = timeout };
         }
 
         /// <summary>
@@ -66,7 +71,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                     }
 
                     // 圖表
-                    await page.WaitForNetworkIdleAsync(new WaitForNetworkIdleOptions { Timeout = 20000 });
+                    await page.WaitForNetworkIdleAsync(_waitForNetworkIdleOptions);
                     var chartElement = await page.WaitForSelectorAsync("div.tradingview-chart", waitForSelectorOptions)
                                           ?? throw new Exception("找不到圖表元素");
 
@@ -176,7 +181,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                     }
 
                     // 圖表
-                    await page.WaitForNetworkIdleAsync(new WaitForNetworkIdleOptions { Timeout = 20000 });
+                    await page.WaitForNetworkIdleAsync(_waitForNetworkIdleOptions);
                     var screenshotElement = await page.WaitForSelectorAsync("div.overview-top", waitForSelectorOptions)
                                             ?? throw new Exception("找不到截圖元素");
                     _logger.LogInformation("擷取網站中...");
@@ -250,7 +255,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                     var priceElement = await page.WaitForSelectorAsync("#tw-stock-tabs div:nth-child(2) section", waitForSelectorOptions)
                                         ?? throw new Exception("找不到價格元素");
 
-                    await page.WaitForNetworkIdleAsync(new WaitForNetworkIdleOptions { Timeout = 20000 });
+                    await page.WaitForNetworkIdleAsync(_waitForNetworkIdleOptions);
 
                     _logger.LogInformation("擷取網站中...");
                     using var stream = await priceElement.ScreenshotStreamAsync();
@@ -263,7 +268,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
                     });
                     _logger.LogInformation("已傳送資訊");
                 }
-                catch(WaitTaskTimeoutException ex)
+                catch (WaitTaskTimeoutException ex)
                 {
                     _logger.LogError(ex.Message, "GetPerformanceAsync");
                     throw;

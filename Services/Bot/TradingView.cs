@@ -12,14 +12,19 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
         private readonly ILogger<TradingView> _logger;
         private readonly IBrowserHandlers _browserHandlers;
         private readonly ICommonService _commonService;
+        private readonly IConfiguration _configuration;
+        private WaitForNetworkIdleOptions _waitForNetworkIdleOptions;
         private string stockUrl = "https://tw.tradingview.com/chart/?symbol=TWSE%3A";
 
-        public TradingView(ITelegramBotClient botClient, ILogger<TradingView> logger, IBrowserHandlers browserHandlers, ICommonService commonService)
+        public TradingView(ITelegramBotClient botClient, ILogger<TradingView> logger, IBrowserHandlers browserHandlers, ICommonService commonService, IConfiguration configuration)
         {
             _botClient = botClient;
             _logger = logger;
             _browserHandlers = browserHandlers;
             _commonService = commonService;
+            _configuration = configuration;
+            var timeout = _configuration.GetValue<int>("WaitForNetworkIdleOptions:Timeout", 3);
+            _waitForNetworkIdleOptions = new WaitForNetworkIdleOptions { Timeout = timeout };
         }
 
         /// <summary>
@@ -96,7 +101,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot
 
                     //等待元素載入
                     _logger.LogInformation("等待元素載入...");
-                    await page.WaitForNetworkIdleAsync(new WaitForNetworkIdleOptions { Timeout = 20000 });
+                    await page.WaitForNetworkIdleAsync(_waitForNetworkIdleOptions);
                     var element = await page.WaitForSelectorAsync("div.chart-markup-table", new WaitForSelectorOptions { Visible = true })
                                     ?? throw new Exception("未找到指定元素:div.chart-markup-table");
 
