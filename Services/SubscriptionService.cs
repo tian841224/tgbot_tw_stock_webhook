@@ -36,7 +36,7 @@ namespace TGBot_TW_Stock_Webhook.Services
 
                 if (user.Status == false) throw new Exception("本帳號無法使用");
 
-                // 判斷使用者是否有訂閱個股推送功能
+                
                 var subscription = await _subscriptionRepository.GetByItemAsync(SubscriptionItemEnum.StockInfo);
 
                 if (subscription == null)
@@ -50,15 +50,16 @@ namespace TGBot_TW_Stock_Webhook.Services
                     await _subscriptionRepository.AddAsync(subscription);
                 }
 
-                var subscriptionUser = await _subscriptionUserRepository.GetByUserIdAndSubscriptionIdAsync(user.Id,subscription.Id);
-                if (subscriptionUser == null)
-                {
-                    _= _subscriptionUserRepository.AddAsync(new SubscriptionUser
-                    {
-                        UserId = user.Id,
-                        SubscriptionId = subscription.Id
-                    });
-                }
+                // 自動加入訂閱個股資訊功能
+                //var subscriptionUser = await _subscriptionUserRepository.GetByUserIdAndSubscriptionIdAsync(user.Id,subscription.Id);
+                //if (subscriptionUser == null)
+                //{
+                //    _= _subscriptionUserRepository.AddAsync(new SubscriptionUser
+                //    {
+                //        UserId = user.Id,
+                //        SubscriptionId = subscription.Id
+                //    });
+                //}
 
                 var subscriptionUserStock = await _subscriptionUserStockRepository.GetByUserIdAndSymbolAsync(user.Id, stock);
                 if (subscriptionUserStock == null)
