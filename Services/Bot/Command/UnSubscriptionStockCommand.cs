@@ -5,7 +5,7 @@ namespace TGBot_TW_Stock_Webhook.Command
 {
     public class UnSubscriptionStockCommand : ICommand
     {
-        public string Name => "/unsub";
+        public string Name => "/del";
         private readonly ITwStockBotService _twStockBotService;
         private readonly IBotService _botService;
 

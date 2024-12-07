@@ -6,7 +6,7 @@ namespace TGBot_TW_Stock_Webhook.Command
 {
     public class SubscriptionInfoCommand : ICommand
     {
-        public string Name => "/ntf";
+        public string Name => "/sub";
         private readonly ITwStockBotService _twStockBotService;
         private readonly IBotService _botService;
 
@@ -30,6 +30,9 @@ namespace TGBot_TW_Stock_Webhook.Command
                     break;
                 case "n":
                     await _twStockBotService.SubscriptionInfoAsync(message, SubscriptionItemEnum.StockNews, cancellationToken);
+                    break;
+                case "i":
+                    await _twStockBotService.SubscriptionInfoAsync(message, SubscriptionItemEnum.StockInfo, cancellationToken);
                     break;
                 default:
                     await _botService.SendErrorMessageAsync(message, cancellationToken);
