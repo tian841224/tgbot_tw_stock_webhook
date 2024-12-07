@@ -50,7 +50,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             try
             {
                 var result = new List<StockInfo>();
-                var date = $"{DateTime.Now:yyyyMMdd}";
+                var date = GetLastWorkingDayInTaiwanTime();
 
                 var url = $"https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date={date}&type=ALLBUT0999";
                 var stockResponse = await FetchDataAsync<TWSEApiResponse>(url, "GetAfterTradingVolume");
@@ -135,6 +135,24 @@ namespace TGBot_TW_Stock_Webhook.Services
                 _logger.LogError($"{methodName} 錯誤: {ex.Message}");
                 throw;
             }
+        }
+
+        private string GetLastWorkingDayInTaiwanTime()
+        {
+            var taiwanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
+            var taiwanTime = TimeZoneInfo.ConvertTime(DateTime.UtcNow, taiwanTimeZone);
+
+            switch (taiwanTime.DayOfWeek)
+            {
+                case DayOfWeek.Saturday:
+                    taiwanTime = taiwanTime.AddDays(-1);
+                    break;
+                case DayOfWeek.Sunday:
+                    taiwanTime = taiwanTime.AddDays(-2);
+                    break;
+            }
+
+            return taiwanTime.ToString("yyyyMMdd");
         }
     }
 }
