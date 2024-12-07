@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using TGBot_TW_Stock_Webhook.Command;
 using TGBot_TW_Stock_Webhook.Data;
@@ -81,6 +82,16 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddResponseCompression();
 builder.Services.AddHealthChecks();
 var app = builder.Build();
+
+// 自動建立資料庫
+using (var scope = app.Services.CreateScope())
+{
+    var dbContextFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
+    using var dbContext = dbContextFactory.CreateDbContext();
+
+    // 自動建立資料庫並執行遷移
+    dbContext.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
