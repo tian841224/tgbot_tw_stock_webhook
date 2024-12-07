@@ -70,6 +70,7 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
                     break;
                 case "/use":
                 case "/start":
+                case "/help":
                     await Usage(msg);
                     break;
                 case "/":
@@ -162,6 +163,15 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
             *市場總覽指令*
             - `/m` - 查詢大盤資訊
             - `/t` - 查詢當日交易量前20名
+
+            *訂閱股票資訊*
+            - `/add [股票代碼]` - 訂閱 股票
+            - `/del [股票代碼]` - 取消訂閱 股票
+            - `/sub t` - 訂閱 當日交易量前20名
+            - `/sub d` - 訂閱 當日市場成交行情
+            - `/sub n` - 訂閱 觀察清單新聞
+            - `/sub i` - 訂閱 當日個股資訊
+            (取消訂閱 unsub + 代號)
             """;
         return await bot.SendMessage(msg.Chat, usage, parseMode: ParseMode.Markdown, replyMarkup: new ReplyKeyboardRemove());
     }
