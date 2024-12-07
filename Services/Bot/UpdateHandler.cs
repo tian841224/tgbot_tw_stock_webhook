@@ -63,7 +63,6 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
                 await _botService.SendErrorMessageAsync(msg, cancellationToken);
                 return;
             }
-
             switch (command)
             {
                 case "hello":
@@ -73,11 +72,17 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
                 case "/start":
                     await Usage(msg);
                     break;
+                case "/":
+                    if (_commandFactory.GetCommand(command) == null)
+                    {
+                        await _botService.SendErrorMessageAsync(msg, cancellationToken);
+                        return;
+                    }
+                    break;
                 default:
                     var cmd = _commandFactory.GetCommand(command);
                     if (cmd == null)
                     {
-                        await _botService.SendErrorMessageAsync(msg, cancellationToken);
                         return;
                     }
 
@@ -162,7 +167,6 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
     }
 
     // 範例程式
-#if DEBUG
     async Task<Message> SendPhoto(Message msg)
     {
         await bot.SendChatAction(msg.Chat, ChatAction.UploadPhoto);
@@ -275,7 +279,4 @@ public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logge
         _logger.LogInformation("Unknown update type: {UpdateType}", update.Type);
         return Task.CompletedTask;
     }
-
-#endif
-
 }
