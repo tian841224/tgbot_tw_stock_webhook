@@ -1,6 +1,6 @@
 # TG 台股查詢機器人 🤖
 
-一個基於 Telegram 的台股資訊查詢機器人，提供即時股價、K線圖表、新聞等多項功能。
+一個基於 Telegram 的台股資訊查詢機器人，提供即時股價、K線圖表、新聞、訂閱股票資訊等功能。
 
 ## Demo (架設於免費平台，功能可能不完整)
 
@@ -12,7 +12,7 @@ https://t.me/Tian_Stock_bot
 
 ### 安裝步驟
 1. Clone 專案
-2. 在 `appsettings.json` 中設定您的 Telegram Bot API Key
+2. 在 `appsettings.json` 中設定您的 Telegram Bot API Key 及其他參數
 3. 啟動專案
 4. 呼叫SetWebHook API 傳入{BotWebhookUrl}/bot/ 例如: https://{yourdomain}/bot
 5. 開始使用 !
@@ -31,86 +31,74 @@ docker build -t [your-image-name] . --no-cache
 - 績效資訊查看
 - 多時間週期K線圖
 
-### 採用技術
+### 🛠️ 採用技術
 - 🤖 Telegram Bot API 整合
 - 🕷️ PuppeteerSharp 爬蟲技術
 - ⚡  .NET 8 開發框架
 - 🐳 Docker 容器化部署
 - 🔄 GitHub Actions CI/CD
-
-### 自動化部署流程
-本專案採用 Git 搭配 GitHub Actions 達成自動化部署：
-
-1. **觸發機制**
-   - 為需部署的 commit 加上 tag
-   - Push 至 GitHub 自動觸發部署流程
-
-2. **CI/CD 流程**
-   - **Build 階段**
-     - 執行程式測試
-     - 驗證功能完整性
-     - 測試通過後觸發部署
-   
-   - **Deploy 階段**
-     - 注入 Telegram Bot API Key
-     - 建立並發布 Docker Image
-     - 自動部署至 EC2 執行環境
+- ☁️ Google Cloud Run、Cloud SQL
 
 ## 🔧 系統架構
 
-<img src="readme/images/flowchart-fix.png" alt="系統架構圖" height="400" width="930">
+<img src="readme/images/flowchar.png" alt="系統架構圖" height="400" width="930">
 
 ## 📖 使用指南
 
-### K線圖表查詢
-```
-/k [股票代碼] [週期]
+  *K線圖表指令*
 
-週期選項：
-h   - 時K線
-d   - 日K線
-w   - 週K線
-m   - 月K線
-5m  - 5分K線
-15m - 15分K線
-30m - 30分K線
-60m - 60分K線
-```
-<img src="readme/images/kline.jpg" alt="K線示例" height="300" width="450">
+  *📊 基本K線圖*
+  格式：`/k [股票代碼] [時間範圍]`
 
-### 基本資訊查詢
-- 股價資訊：`/v [股票代碼]`
-  
-  <img src="readme/images/detail.jpg" alt="detail" height="300" width="450">
-- 績效資訊：`/p [股票代碼]`
-  
- <img src="readme/images/proformance.jpg" alt="proformance" height="300" width="450">
- 
-- 個股新聞：`/n [股票代碼]`
-  
- <img src="readme/images/news.jpg" alt="news" height="300" width="450">
+  時間範圍選項（預設：d）：
+  - `h` - 時K線
+  - `d` - 日K線 
+  - `w` - 週K線
+  - `m` - 月K線
+  - `5m` - 5分K線
+  - `15m` - 15分K線
+  - `30m` - 30分K線
+  - `60m` - 60分K線
 
+  *📈 TradingView K線圖*
+  格式：`/c [股票代碼] [時間範圍]`
 
-### TradingView 圖表
-```
-/chart [股票代碼]
-/range [股票代碼] [時間範圍]
+  時間範圍選項（預設：1d）：
+  - `1d` - 一日
+  - `5d` - 五日
+  - `1m` - 一個月
+  - `3m` - 三個月
+  - `6m` - 六個月
+  - `ytd` - 今年度
+  - `1y` - 一年
+  - `5y` - 五年
+  - `all` - 全部時間
 
-時間範圍選項：
-1d  - 一日    5d  - 五日
-1m  - 一個月  3m  - 三個月
-6m  - 六個月  ytd - 今年度
-1y  - 一年    5y  - 五年
-all - 全部時間
-```
-<img src="readme/images/chart.jpg" alt="chart" height="300" width="450">
+  *股票資訊指令*
+  - `/d [股票代碼]` - 查詢股票詳細資訊
+  - `/p [股票代碼]` - 查詢股票績效
+  - `/n [股票代碼]` - 查詢股票新聞
+  - `/yn [股票代碼]` - 查詢Yahoo股票新聞（預設：台股新聞）
+  - `/i [股票代碼]` - 查詢當日收盤資訊
 
-## 🔍 已知問題
+  *市場總覽指令*
+  - `/m` - 查詢大盤資訊
+  - `/t` - 查詢當日交易量前20名
+
+  *訂閱股票資訊*
+  - `/add [股票代碼]` - 訂閱 股票
+  - `/del [股票代碼]` - 取消訂閱 股票
+  - `/sub t` - 訂閱 當日交易量前20名
+  - `/sub d` - 訂閱 當日市場成交行情
+  - `/sub n` - 訂閱 觀察清單新聞
+  - `/sub i` - 訂閱 當日個股資訊
+  -  (取消訂閱 unsub + 代號)
+
+## 🚨 已知問題
 - TradingView 在高頻訪問時可能會要求登入
 
 ## 📝 開發計劃
 - [ ] 新增美股市場支援
-- [ ] 觀察名單功能
 
 ## 🤝 貢獻指南
 歡迎提交 Issue 和 Pull Request 來協助改善專案！
