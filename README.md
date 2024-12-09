@@ -39,6 +39,13 @@ docker build -t [your-image-name] . --no-cache
 - 🔄 GitHub Actions CI/CD
 - ☁️ Google Cloud Run、Cloud SQL
 
+### 🛡️ 技術亮點
+- 健康檢查機制 (HealthChecks)
+- 回應壓縮 (Response Compression)
+- 兩種可選資料庫 (MySQL、SQLite)
+- 服務延遲載入 (Lazy)
+
+
 ## 🔧 系統架構
 
 <img src="readme/images/flowchar.png" alt="系統架構圖" height="400" width="930">
