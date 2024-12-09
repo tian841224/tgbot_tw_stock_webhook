@@ -2,7 +2,7 @@
 using TGBot_TW_Stock_Webhook.Interface.Services;
 using TGBot_TW_Stock_Webhook.Services.Bot;
 
-namespace TGBot_TW_Stock_Webhook.Command
+namespace TGBot_TW_Stock_Webhook.Services.Bot.Command
 {
     public class NewsCommand : ICommand
     {

@@ -1,6 +1,6 @@
 ﻿using TGBot_TW_Stock_Webhook.Enum;
 
-namespace TGBot_TW_Stock_Webhook.Model
+namespace TGBot_TW_Stock_Webhook.Model.Configuration
 {
     public sealed class DataBase
     {

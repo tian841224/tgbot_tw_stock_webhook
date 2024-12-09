@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot.Types;
 using TGBot_TW_Stock_Webhook.Interface.Services;
 
-namespace TGBot_TW_Stock_Webhook.Command
+namespace TGBot_TW_Stock_Webhook.Services.Bot.Command
 {
     public class DailyMarketInfoCommand : ICommand
     {
@@ -19,7 +19,7 @@ namespace TGBot_TW_Stock_Webhook.Command
 
             try
             {
-                var count = !string.IsNullOrEmpty(arg1) && Int16.TryParse(arg1, out short result)
+                var count = !string.IsNullOrEmpty(arg1) && short.TryParse(arg1, out short result)
                              ? result
                               : (short)1;
                 await _twStockBot.GetDailyMarketInfoAsync(message, cancellationToken, count);

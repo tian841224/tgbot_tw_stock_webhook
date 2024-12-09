@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using TGBot_TW_Stock_Webhook.Model.DTOs;
-using TGBot_TW_Stock_Webhook.Services;
+using TGBot_TW_Stock_Webhook.Model.Configuration;
+using TGBot_TW_Stock_Webhook.Services.Bot;
 
 namespace TGBot_TW_Stock_Webhook.Controllers;
 

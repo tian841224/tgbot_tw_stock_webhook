@@ -1,7 +1,6 @@
 using System.Text;
 using Telegram.Bot.Types;
 using TGBot_TW_Stock_Webhook.Enum;
-using TGBot_TW_Stock_Webhook.Interface;
 using TGBot_TW_Stock_Webhook.Interface.Repository;
 using TGBot_TW_Stock_Webhook.Interface.Services;
 using TGBot_TW_Stock_Webhook.Model.DTOs;

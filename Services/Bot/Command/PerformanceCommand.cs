@@ -2,7 +2,7 @@
 using TGBot_TW_Stock_Webhook.Interface.Services;
 using TGBot_TW_Stock_Webhook.Services.Bot;
 
-namespace TGBot_TW_Stock_Webhook.Command
+namespace TGBot_TW_Stock_Webhook.Services.Bot.Command
 {
     public class PerformanceCommand : ICommand
     {
@@ -23,7 +23,7 @@ namespace TGBot_TW_Stock_Webhook.Command
             {
                 if (!string.IsNullOrEmpty(symbol))
                 {
-                    var count = !string.IsNullOrEmpty(symbol) && Int16.TryParse(symbol, out var result)
+                    var count = !string.IsNullOrEmpty(symbol) && short.TryParse(symbol, out var result)
                             ? result
                             : 1;
 

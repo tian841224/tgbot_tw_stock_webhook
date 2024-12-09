@@ -2,7 +2,7 @@
 using TGBot_TW_Stock_Webhook.Enum;
 using TGBot_TW_Stock_Webhook.Interface.Services;
 
-namespace TGBot_TW_Stock_Webhook.Command
+namespace TGBot_TW_Stock_Webhook.Services.Bot.Command
 {
     public class SubscriptionInfoCommand : ICommand
     {
