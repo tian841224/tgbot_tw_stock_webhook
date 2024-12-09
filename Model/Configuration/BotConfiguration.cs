@@ -1,4 +1,4 @@
-﻿namespace TGBot_TW_Stock_Webhook.Model.DTOs
+﻿namespace TGBot_TW_Stock_Webhook.Model.Configuration
 {
     public class BotConfiguration
     {

@@ -8,7 +8,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 using TGBot_TW_Stock_Webhook.Interface.Services;
 using TGBot_TW_Stock_Webhook.Model.DTOs;
 
-namespace TGBot_TW_Stock_Webhook.Services;
+namespace TGBot_TW_Stock_Webhook.Services.Bot;
 
 public class UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> _logger, IBotService botService, ICommandFactory commandFactory)
 {

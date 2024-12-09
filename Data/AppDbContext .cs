@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TGBot_TW_Stock_Webhook.Model.Entities;
-using TGBot_TW_Stock_Webhook.Model;
 using TGBot_TW_Stock_Webhook.Enum;
 using System.Reflection;
+using TGBot_TW_Stock_Webhook.Model.Configuration;
 
 namespace TGBot_TW_Stock_Webhook.Data
 {

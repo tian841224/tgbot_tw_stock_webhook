@@ -4,7 +4,7 @@ using TGBot_TW_Stock_Webhook.Enum;
 using TGBot_TW_Stock_Webhook.Interface.Repository;
 using TGBot_TW_Stock_Webhook.Model.Entities;
 
-namespace TGBot_TW_Stock_Webhook.Services
+namespace TGBot_TW_Stock_Webhook.Repository
 {
     public class SubscriptionRepository(ILogger<SubscriptionRepository> _logger, IDbContextFactory<AppDbContext> _contextFactory) : ISubscriptionRepository
     {
