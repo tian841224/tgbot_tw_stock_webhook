@@ -88,6 +88,7 @@ docker build -t [your-image-name] . --no-cache
   *訂閱股票資訊*
   - `/add [股票代碼]` - 訂閱 股票
   - `/del [股票代碼]` - 取消訂閱 股票
+  - `/list ` - 查詢已訂閱股票清單
   - `/sub t` - 訂閱 當日交易量前20名
   - `/sub d` - 訂閱 當日市場成交行情
   - `/sub n` - 訂閱 觀察清單新聞
