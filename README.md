@@ -13,9 +13,12 @@ https://t.me/Tian_Stock_bot
 ### 安裝步驟
 1. Clone 專案
 2. 在 `appsettings.json` 中設定您的 Telegram Bot API Key 及其他參數
-3. 啟動專案
-4. 呼叫SetWebHook API 傳入{BotWebhookUrl}/bot/ 例如: https://{yourdomain}/bot
-5. 開始使用 !
+3. 生成 Migrations 檔案
+dotnet ef migrations add InitialCreate
+dotnet ef database update
+4. 啟動專案
+5. 呼叫SetWebHook API 傳入{BotWebhookUrl}/bot/ 例如: https://{yourdomain}/bot
+6. 開始使用 !
 
 ### 🐳 Docker 部署
 ```bash
