@@ -5,7 +5,7 @@ namespace TGBot_TW_Stock_Webhook.Services.Bot.Command
 {
     public class GetSubscriptionStockListCommand : ICommand
     {
-        public string Name => "/g";
+        public string Name => "/l";
         private readonly ITwStockBotService _twStockBotService;
 
         public GetSubscriptionStockListCommand(ITwStockBotService twStockBotService)
