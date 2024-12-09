@@ -1,16 +1,18 @@
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Newtonsoft.Json;
+using System.Net.Mime;
 using Telegram.Bot;
-using TGBot_TW_Stock_Webhook.Command;
 using TGBot_TW_Stock_Webhook.Data;
 using TGBot_TW_Stock_Webhook.Extensions;
-using TGBot_TW_Stock_Webhook.Interface;
 using TGBot_TW_Stock_Webhook.Interface.Repository;
 using TGBot_TW_Stock_Webhook.Interface.Services;
-using TGBot_TW_Stock_Webhook.Model;
-using TGBot_TW_Stock_Webhook.Model.DTOs;
+using TGBot_TW_Stock_Webhook.Model.Configuration;
 using TGBot_TW_Stock_Webhook.Repository;
 using TGBot_TW_Stock_Webhook.Services;
 using TGBot_TW_Stock_Webhook.Services.Bot;
+using TGBot_TW_Stock_Webhook.Services.Bot.Command;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,7 +82,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddResponseCompression();
-builder.Services.AddHealthChecks();
+
+// 健康狀態檢查
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<AppDbContext>()
+    .AddUrlGroup(new Uri("https://tw.tradingview.com/"), "TradingView Connect HealthCheck", HealthStatus.Degraded)
+    .AddUrlGroup(new Uri("https://www.cnyes.com/"), "Cnyes Connect HealthCheck", HealthStatus.Degraded);
+
 var app = builder.Build();
 
 // 自動建立資料庫
@@ -107,5 +115,19 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapGet("/", () => "Hello World!");
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        var result = JsonConvert.SerializeObject(
+            new
+            {
+                status = report.Status.ToString(),
+                errors = report.Entries.Select(e => new { key = e.Key, value = Enum.GetName(typeof(HealthStatus), e.Value.Status) })
+            });
+        context.Response.ContentType = MediaTypeNames.Application.Json;
+        await context.Response.WriteAsync(result);
+    }
+});
 
 app.Run();
