@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TGBot_TW_Stock_Webhook.Attribute
+namespace TGBot_TW_Stock_Webhook.Infrastructure.Attribute
 {
     public class HeaderValidationFilter : ActionFilterAttribute
     {

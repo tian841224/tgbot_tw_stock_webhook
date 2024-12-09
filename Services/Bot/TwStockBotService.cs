@@ -7,7 +7,7 @@ using System.Xml;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using TGBot_TW_Stock_Webhook.Enum;
-using TGBot_TW_Stock_Webhook.Extensions;
+using TGBot_TW_Stock_Webhook.Infrastructure.Extensions;
 using TGBot_TW_Stock_Webhook.Interface.Services;
 using TGBot_TW_Stock_Webhook.Model.DTOs;
 

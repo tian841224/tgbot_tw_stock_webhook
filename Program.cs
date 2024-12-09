@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using System.Net.Mime;
 using Telegram.Bot;
 using TGBot_TW_Stock_Webhook.Data;
-using TGBot_TW_Stock_Webhook.Extensions;
+using TGBot_TW_Stock_Webhook.Infrastructure.Extensions;
 using TGBot_TW_Stock_Webhook.Interface.Repository;
 using TGBot_TW_Stock_Webhook.Interface.Services;
 using TGBot_TW_Stock_Webhook.Model.Configuration;
