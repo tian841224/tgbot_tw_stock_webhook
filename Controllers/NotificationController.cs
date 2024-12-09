@@ -19,7 +19,7 @@ namespace TGBot_TW_Stock_Webhook.Controllers
             }
             catch (Exception exception)
             {
-                return new BadRequestObjectResult(exception);
+                return Problem(detail: exception.Message, statusCode: 500);
             }
         }
 
@@ -34,7 +34,7 @@ namespace TGBot_TW_Stock_Webhook.Controllers
             }
             catch (Exception exception)
             {
-                return new BadRequestObjectResult(exception);
+                return Problem(detail: exception.Message, statusCode: 500);
             }
         }
 
@@ -49,7 +49,7 @@ namespace TGBot_TW_Stock_Webhook.Controllers
             }
             catch (Exception exception)
             {
-                return new BadRequestObjectResult(exception);
+                return Problem(detail: exception.Message, statusCode: 500);
             }
         }
 
@@ -64,7 +64,7 @@ namespace TGBot_TW_Stock_Webhook.Controllers
             }
             catch (Exception exception)
             {
-                return new BadRequestObjectResult(exception);
+                return Problem(detail: exception.Message, statusCode: 500);
             }
         }
     }
