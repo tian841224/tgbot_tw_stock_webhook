@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using TGBot_TW_Stock_Webhook.Extensions;
+using TGBot_TW_Stock_Webhook.Infrastructure.Extensions;
 using TGBot_TW_Stock_Webhook.Interface.Services;
 using TGBot_TW_Stock_Webhook.Model.DTOs;
 

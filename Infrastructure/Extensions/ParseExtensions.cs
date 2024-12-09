@@ -1,4 +1,4 @@
-﻿namespace TGBot_TW_Stock_Webhook.Extensions
+﻿namespace TGBot_TW_Stock_Webhook.Infrastructure.Extensions
 {
     public static class ParseExtensions
     {

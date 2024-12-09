@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TGBot_TW_Stock_Webhook.Infrastructure.Attribute;
 using TGBot_TW_Stock_Webhook.Interface.Services;
 
 namespace TGBot_TW_Stock_Webhook.Controllers
@@ -8,6 +9,7 @@ namespace TGBot_TW_Stock_Webhook.Controllers
     public class NotificationController : ControllerBase
     {
         [HttpGet]
+        [HeaderValidationFilter]
         public async Task<IActionResult> SendDailyMarketInfoAsync([FromServices] INotificationService notificationService, CancellationToken ct)
         {
             try
@@ -22,6 +24,7 @@ namespace TGBot_TW_Stock_Webhook.Controllers
         }
 
         [HttpGet]
+        [HeaderValidationFilter]
         public async Task<IActionResult> SendStockInfoAsync([FromServices] INotificationService notificationService, CancellationToken ct)
         {
             try
@@ -36,6 +39,7 @@ namespace TGBot_TW_Stock_Webhook.Controllers
         }
 
         [HttpGet]
+        [HeaderValidationFilter]
         public async Task<IActionResult> SendStockNewsAsync([FromServices] INotificationService notificationService, CancellationToken ct)
         {
             try
@@ -50,6 +54,7 @@ namespace TGBot_TW_Stock_Webhook.Controllers
         }
 
         [HttpGet]
+        [HeaderValidationFilter]
         public async Task<IActionResult> SendTopVolumeItemsAsync([FromServices] INotificationService notificationService, CancellationToken ct)
         {
             try
