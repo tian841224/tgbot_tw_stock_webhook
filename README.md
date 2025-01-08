@@ -110,3 +110,6 @@ docker build -t [your-image-name] . --no-cache
 
 ## 🤝 貢獻指南
 歡迎提交 Issue 和 Pull Request 來協助改善專案！
+
+## 專案狀態
+![Alt](https://repobeats.axiom.co/api/embed/7ead2bc51e44f7546555bd393125207e64640986.svg "Repobeats analytics image")
