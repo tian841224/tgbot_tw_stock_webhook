@@ -40,7 +40,7 @@ namespace TGBot_TW_Stock_Webhook.Services
             catch (Exception ex)
             {
                 await ReleaseBrowserAsync();
-                _logger.LogError(ex.Message,"LoadUrlAsync");
+                _logger.LogError(ex.Message, "LoadUrlAsync");
                 throw new Exception($"LoadUrlAsync : {ex.Message}");
             }
         }
@@ -156,7 +156,7 @@ namespace TGBot_TW_Stock_Webhook.Services
                 }
                 else
                 {
-                    options.ExecutablePath = "/usr/bin/chromium";
+                    options.ExecutablePath = "/usr/bin/google-chrome-stable";
                 }
 
                 // 啟動瀏覽器
